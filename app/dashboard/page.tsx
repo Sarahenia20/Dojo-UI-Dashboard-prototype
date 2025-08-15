@@ -1,25 +1,40 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Shield, TrendingUp, Play, MessageSquare, CheckCircle } from "lucide-react"
+import { Shield, CheckCircle, Users, Activity, Clock, Zap, BarChart3, Plus } from "lucide-react"
 
 export default function DashboardPage() {
   return (
     <div className="space-y-6">
-      {/* Welcome Header */}
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 p-8 text-white">
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 p-6 text-white">
         <div className="relative z-10">
-          <h1 className="text-3xl font-bold mb-2">Welcome to SamurAI Dojo, Erika</h1>
-          <p className="text-cyan-100 mb-4">Healthcare Security Analyst</p>
-          <p className="text-cyan-50 max-w-2xl">
-            Your cybersecurity journey starts here. Discover AI-powered security tools tailored to your healthcare
-            environment.
-          </p>
-          <div className="flex items-center mt-4 space-x-4">
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-              5 Active Products
-            </Badge>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-1">Welcome, Erika</h1>
+              <p className="text-cyan-100 text-sm mb-4">Last active: 2 hours ago</p>
+              <div className="flex items-center space-x-2 text-sm">
+                <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                  <CheckCircle className="w-3 h-3 mr-1" />
+                  Security Evaluation - 75% Complete
+                </Badge>
+                <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                  <Clock className="w-3 h-3 mr-1" />
+                  Compliance Review pending
+                </Badge>
+              </div>
+            </div>
+            <div className="flex space-x-3">
+              <Button variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-white/30">
+                New Search
+              </Button>
+              <Button variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-white/30">
+                View Reports
+              </Button>
+              <Button variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-white/30">
+                Resume Project
+              </Button>
+            </div>
           </div>
         </div>
         {/* Decorative Background */}
@@ -40,107 +55,221 @@ export default function DashboardPage() {
       </div>
 
       {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* AI Recommendations */}
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Zap className="h-5 w-5 text-cyan-500" />
+                <CardTitle>AI Recommendations</CardTitle>
+              </div>
+              <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">90% Accuracy</Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="p-4 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg text-white">
+                <div className="text-2xl font-bold">+23%</div>
+                <div className="text-sm text-cyan-100">Improvement potential</div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-sm">Phantom SOAR Platform</p>
+                    <p className="text-xs text-muted-foreground">Top security automation potential</p>
+                  </div>
+                  <Badge variant="outline" className="text-xs">
+                    +30%
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-sm">LogRhythm SIEM+</p>
+                    <p className="text-xs text-muted-foreground">Log analysis optimization</p>
+                  </div>
+                  <Badge variant="outline" className="text-xs">
+                    +18%
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Labs */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Shield className="h-5 w-5 text-blue-500" />
+                <CardTitle>Recent Labs</CardTitle>
+              </div>
+              <Button variant="outline" size="sm">
+                <Plus className="w-4 h-4 mr-1" />
+                Deploy Lab
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* Active Labs */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 border rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-green-200 dark:border-green-800">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="text-sm font-medium">Windows AD Lab</span>
+                    </div>
+                    <Badge
+                      variant="secondary"
+                      className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+                    >
+                      Active
+                    </Badge>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-xs text-muted-foreground">TechCorp Security workspace</div>
+                    <Progress value={75} className="h-2" />
+                    <div className="text-xs text-muted-foreground">25 minutes remaining</div>
+                  </div>
+                </div>
+
+                <div className="p-4 border rounded-lg bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950 dark:to-cyan-950 border-blue-200 dark:border-blue-800">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      <span className="text-sm font-medium">Linux SIEM Test</span>
+                    </div>
+                    <Badge
+                      variant="secondary"
+                      className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+                    >
+                      Active
+                    </Badge>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-xs text-muted-foreground">Erika SecOps workspace</div>
+                    <Progress value={45} className="h-2" />
+                    <div className="text-xs text-muted-foreground">1.2 hours remaining</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Lab History */}
+              <div className="space-y-3">
+                <div className="text-sm font-medium text-muted-foreground">Recent Activity</div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                        <Shield className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium">Splunk Enterprise Lab</div>
+                        <div className="text-xs text-muted-foreground">Completed 2h ago • 45 min session</div>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="text-xs">
+                      Completed
+                    </Badge>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
+                        <Users className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium">QRadar SIEM Demo</div>
+                        <div className="text-xs text-muted-foreground">Completed 4h ago • 1.2 hour session</div>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="text-xs">
+                      Completed
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Security Posture */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Healthcare Security Path */}
         <Card>
           <CardHeader>
             <div className="flex items-center space-x-2">
-              <Shield className="h-5 w-5 text-cyan-500" />
-              <CardTitle>Healthcare Security Path</CardTitle>
+              <BarChart3 className="h-5 w-5 text-cyan-500" />
+              <CardTitle>Security Posture</CardTitle>
             </div>
-            <CardDescription>Master cybersecurity for healthcare environments</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center space-y-4">
+              <div className="text-4xl font-bold text-cyan-600">78</div>
+              <div className="text-sm text-muted-foreground">+15 this quarter</div>
+
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className="text-lg font-semibold text-green-600">+12</div>
+                  <div className="text-xs text-muted-foreground">Endpoint Protection</div>
+                </div>
+                <div>
+                  <div className="text-lg font-semibold text-blue-600">+8</div>
+                  <div className="text-xs text-muted-foreground">Network Security</div>
+                </div>
+                <div>
+                  <div className="text-lg font-semibold text-red-600">-5</div>
+                  <div className="text-xs text-muted-foreground">Compliance</div>
+                </div>
+              </div>
+
+              <div className="p-3 bg-cyan-50 dark:bg-cyan-950 rounded-lg">
+                <div className="text-sm font-medium text-cyan-800 dark:text-cyan-200">Top 25% in Manufacturing</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Activity */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center space-x-2">
+              <Activity className="h-5 w-5 text-blue-500" />
+              <CardTitle>Recent Activity</CardTitle>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
-                <div className="flex space-x-1">
-                  {[1, 2, 3].map((i) => (
-                    <div
-                      key={i}
-                      className="w-8 h-8 rounded-full bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center"
-                    >
-                      <CheckCircle className="w-4 h-4 text-cyan-600" />
-                    </div>
-                  ))}
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">SOAR comparison generated</p>
+                  <p className="text-xs text-muted-foreground">2h</p>
                 </div>
-                <span className="text-sm text-muted-foreground">3 modules completed</span>
               </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Next: HIPAA Compliance Overview (5 min)</span>
+              <div className="flex items-center space-x-3">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Splunk vs QRadar report</p>
+                  <p className="text-xs text-muted-foreground">4h</p>
                 </div>
-                <Progress value={60} className="h-2" />
               </div>
-              <Button className="w-full bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600">
-                Continue Learning
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Hot in Healthcare */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="h-5 w-5 text-orange-500" />
-              <CardTitle>Hot in Healthcare</CardTitle>
-            </div>
-            <CardDescription>Most popular security tools this month</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-accent rounded-lg">
-                <div>
-                  <p className="font-medium">SIEM Solutions in Healthcare</p>
-                  <p className="text-sm text-muted-foreground">+23% adoption in healthcare</p>
+              <div className="flex items-center space-x-3">
+                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Windows lab deployed</p>
+                  <p className="text-xs text-muted-foreground">6h</p>
                 </div>
-                <Badge>Trending</Badge>
               </div>
-              <Button variant="outline" className="w-full bg-transparent">
-                View Trending
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Platform Tour */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center space-x-2">
-              <Play className="h-5 w-5 text-blue-500" />
-              <CardTitle>Platform Tour</CardTitle>
-            </div>
-            <CardDescription>Master the Dojo in 3 minutes</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="aspect-video bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Play className="w-12 h-12 text-white" />
+              <div className="flex items-center space-x-3">
+                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Team collaboration</p>
+                  <p className="text-xs text-muted-foreground">1d</p>
+                </div>
               </div>
-              <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-                Start Tour
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* AI Assistant */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center space-x-2">
-              <MessageSquare className="h-5 w-5 text-green-500" />
-              <CardTitle>AI Assistant</CardTitle>
-            </div>
-            <CardDescription>Get personalized security recommendations</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="aspect-video bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
-                <MessageSquare className="w-12 h-12 text-white" />
-              </div>
-              <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
-                Chat with AI
-              </Button>
             </div>
           </CardContent>
         </Card>

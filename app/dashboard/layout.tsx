@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useTheme } from "next-themes"
+import { CheckCircle } from "lucide-react"
 import {
   LayoutDashboard,
   Search,
@@ -30,6 +31,7 @@ import {
   HelpCircle,
   Bug,
   LogOut,
+  Users,
 } from "lucide-react"
 
 const navigation = [
@@ -37,6 +39,7 @@ const navigation = [
   { name: "Product Search", href: "/dashboard/search", icon: Search },
   { name: "Security Labs", href: "/dashboard/labs", icon: Shield },
   { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+  { name: "Workspaces", href: "/dashboard/workspaces", icon: Users },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 
@@ -48,6 +51,12 @@ export default function DashboardLayout({
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [currentWorkspace, setCurrentWorkspace] = useState("Erika SecOps")
+
+  const workspaces = [
+    { name: "Erika SecOps", type: "Personal", icon: Shield, color: "cyan" },
+    { name: "TechCorp Security", type: "Team", icon: Users, color: "orange" },
+  ]
 
   return (
     <div className="min-h-screen bg-background">
@@ -92,17 +101,67 @@ export default function DashboardLayout({
           </ul>
         </nav>
 
-        {/* User Profile Section */}
+        {/* Workspace Switcher Section */}
         <div className="absolute bottom-4 left-3 right-3">
-          <div className="flex items-center space-x-3 px-3 py-2 bg-accent/50 rounded-lg">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src="/professional-avatar.png" />
-              <AvatarFallback>E</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">Erika</p>
-              <p className="text-xs text-muted-foreground truncate">Healthcare Security Analyst</p>
-            </div>
+          <div className="mb-4">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 mb-2">
+              Current Workspace
+            </p>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="w-full px-3 py-2 bg-accent/50 rounded-lg hover:bg-accent/70 transition-colors"
+                >
+                  <div className="flex items-center space-x-3 w-full">
+                    <div className="w-8 h-8 bg-cyan-100 dark:bg-cyan-900 rounded-full flex items-center justify-center">
+                      <Shield className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                    </div>
+                    <div className="flex-1 min-w-0 text-left">
+                      <p className="text-sm font-medium text-foreground truncate">{currentWorkspace}</p>
+                      <p className="text-xs text-muted-foreground truncate">Personal</p>
+                    </div>
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="start" side="top">
+                {workspaces.map((workspace) => (
+                  <DropdownMenuItem
+                    key={workspace.name}
+                    className="cursor-pointer p-3"
+                    onClick={() => setCurrentWorkspace(workspace.name)}
+                  >
+                    <div className="flex items-center space-x-3 w-full">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          workspace.color === "cyan"
+                            ? "bg-cyan-100 dark:bg-cyan-900"
+                            : "bg-orange-100 dark:bg-orange-900"
+                        }`}
+                      >
+                        <workspace.icon
+                          className={`w-4 h-4 ${
+                            workspace.color === "cyan"
+                              ? "text-cyan-600 dark:text-cyan-400"
+                              : "text-orange-600 dark:text-orange-400"
+                          }`}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{workspace.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{workspace.type}</p>
+                      </div>
+                      {currentWorkspace === workspace.name && <CheckCircle className="w-4 h-4 text-cyan-500" />}
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* Branding Footer */}
+          <div className="text-center py-2 border-t border-border/50">
+            <p className="text-xs text-muted-foreground">© 2025 SamurAI DOJO Inc.</p>
           </div>
         </div>
       </div>
