@@ -16,11 +16,11 @@ export default function DashboardPage() {
               <div className="flex items-center space-x-2 text-sm">
                 <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
                   <CheckCircle className="w-3 h-3 mr-1" />
-                  Security Evaluation - 75% Complete
+                  Business Evaluation - 75% Complete
                 </Badge>
                 <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
                   <Clock className="w-3 h-3 mr-1" />
-                  Compliance Review pending
+                  Productivity Review pending
                 </Badge>
               </div>
             </div>
@@ -76,8 +76,8 @@ export default function DashboardPage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-sm">Phantom SOAR Platform</p>
-                    <p className="text-xs text-muted-foreground">Top security automation potential</p>
+                    <p className="font-medium text-sm">Microsoft 365 Suite</p>
+                    <p className="text-xs text-muted-foreground">Productivity optimization potential</p>
                   </div>
                   <Badge variant="outline" className="text-xs">
                     +30%
@@ -85,8 +85,8 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-sm">LogRhythm SIEM+</p>
-                    <p className="text-xs text-muted-foreground">Log analysis optimization</p>
+                    <p className="font-medium text-sm">Slack Enterprise Grid</p>
+                    <p className="text-xs text-muted-foreground">Team collaboration enhancement</p>
                   </div>
                   <Badge variant="outline" className="text-xs">
                     +18%
@@ -97,17 +97,17 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Recent Labs */}
+        {/* Recent Labs & Environments */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <Shield className="h-5 w-5 text-blue-500" />
-                <CardTitle>Recent Labs</CardTitle>
+                <Zap className="h-5 w-5 text-blue-500" />
+                <CardTitle>Recent Labs & Environments</CardTitle>
               </div>
               <Button variant="outline" size="sm">
                 <Plus className="w-4 h-4 mr-1" />
-                Deploy Lab
+                Deploy Environment
               </Button>
             </div>
           </CardHeader>
@@ -119,7 +119,7 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <span className="text-sm font-medium">Windows AD Lab</span>
+                      <span className="text-sm font-medium">Office 365 Setup</span>
                     </div>
                     <Badge
                       variant="secondary"
@@ -139,7 +139,7 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
                       <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                      <span className="text-sm font-medium">Linux SIEM Test</span>
+                      <span className="text-sm font-medium">Network Security Test</span>
                     </div>
                     <Badge
                       variant="secondary"
@@ -163,10 +163,10 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
-                        <Shield className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                        <Users className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                       </div>
                       <div>
-                        <div className="text-sm font-medium">Splunk Enterprise Lab</div>
+                        <div className="text-sm font-medium">Teams Integration Lab</div>
                         <div className="text-xs text-muted-foreground">Completed 2h ago • 45 min session</div>
                       </div>
                     </div>
@@ -178,10 +178,10 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
-                        <Users className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                        <Shield className="w-4 h-4 text-orange-600 dark:text-orange-400" />
                       </div>
                       <div>
-                        <div className="text-sm font-medium">QRadar SIEM Demo</div>
+                        <div className="text-sm font-medium">Firewall Configuration</div>
                         <div className="text-xs text-muted-foreground">Completed 4h ago • 1.2 hour session</div>
                       </div>
                     </div>
@@ -196,13 +196,13 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Security Posture */}
+      {/* Business Intelligence */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <div className="flex items-center space-x-2">
               <BarChart3 className="h-5 w-5 text-cyan-500" />
-              <CardTitle>Security Posture</CardTitle>
+              <CardTitle>Business Intelligence</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
@@ -213,20 +213,22 @@ export default function DashboardPage() {
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
                   <div className="text-lg font-semibold text-green-600">+12</div>
-                  <div className="text-xs text-muted-foreground">Endpoint Protection</div>
+                  <div className="text-xs text-muted-foreground">Productivity Tools</div>
                 </div>
                 <div>
                   <div className="text-lg font-semibold text-blue-600">+8</div>
-                  <div className="text-xs text-muted-foreground">Network Security</div>
+                  <div className="text-xs text-muted-foreground">Security Posture</div>
                 </div>
                 <div>
-                  <div className="text-lg font-semibold text-red-600">-5</div>
-                  <div className="text-xs text-muted-foreground">Compliance</div>
+                  <div className="text-lg font-semibold text-purple-600">+5</div>
+                  <div className="text-xs text-muted-foreground">Process Efficiency</div>
                 </div>
               </div>
 
               <div className="p-3 bg-cyan-50 dark:bg-cyan-950 rounded-lg">
-                <div className="text-sm font-medium text-cyan-800 dark:text-cyan-200">Top 25% in Manufacturing</div>
+                <div className="text-sm font-medium text-cyan-800 dark:text-cyan-200">
+                  Top 25% in Healthcare Technology
+                </div>
               </div>
             </div>
           </CardContent>
@@ -245,28 +247,28 @@ export default function DashboardPage() {
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">SOAR comparison generated</p>
+                  <p className="text-sm font-medium">Productivity suite comparison</p>
                   <p className="text-xs text-muted-foreground">2h</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">Splunk vs QRadar report</p>
+                  <p className="text-sm font-medium">Security assessment report</p>
                   <p className="text-xs text-muted-foreground">4h</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">Windows lab deployed</p>
+                  <p className="text-sm font-medium">Teams integration deployed</p>
                   <p className="text-xs text-muted-foreground">6h</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">Team collaboration</p>
+                  <p className="text-sm font-medium">Workflow automation setup</p>
                   <p className="text-xs text-muted-foreground">1d</p>
                 </div>
               </div>
@@ -279,9 +281,9 @@ export default function DashboardPage() {
       <Card>
         <CardContent className="p-8">
           <div className="text-center space-y-4">
-            <h3 className="text-2xl font-bold">Ready to explore cybersecurity solutions?</h3>
+            <h3 className="text-2xl font-bold">Ready to explore business solutions?</h3>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Discover AI-powered product recommendations tailored to your needs
+              Discover AI-powered recommendations for productivity, security, and business tools tailored to your needs
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button className="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600">
@@ -296,7 +298,7 @@ export default function DashboardPage() {
 
       {/* Partner Logos */}
       <div className="text-center space-y-4">
-        <h4 className="text-lg font-semibold">Trusted by security professionals worldwide</h4>
+        <h4 className="text-lg font-semibold">Trusted by business professionals worldwide</h4>
         <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
           <div className="text-2xl font-bold text-blue-600">Google</div>
           <div className="text-2xl font-bold text-blue-800">Microsoft</div>
