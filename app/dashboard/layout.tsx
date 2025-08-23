@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -19,7 +18,7 @@ import { CheckCircle } from "lucide-react"
 import {
   LayoutDashboard,
   Search,
-  Shield,
+  Zap,
   BarChart3,
   Settings,
   Moon,
@@ -32,12 +31,16 @@ import {
   Bug,
   LogOut,
   Users,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Menu,
 } from "lucide-react"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Product Search", href: "/dashboard/search", icon: Search },
-  { name: "Security Labs", href: "/dashboard/labs", icon: Shield },
+  { name: "Product Search", href: "/dashboard/product-search", icon: Search },
+  { name: "Samurai Labs", href: "/dashboard/labs", icon: Zap },
   { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
   { name: "Workspaces", href: "/dashboard/workspaces", icon: Users },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
@@ -50,34 +53,59 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [currentWorkspace, setCurrentWorkspace] = useState("Erika SecOps")
+  const [mainSidebarCollapsed, setMainSidebarCollapsed] = useState(false)
+  const [currentWorkspace, setCurrentWorkspace] = useState("Erika Workspace")
 
   const workspaces = [
-    { name: "Erika SecOps", type: "Personal", icon: Shield, color: "cyan" },
-    { name: "TechCorp Security", type: "Team", icon: Users, color: "orange" },
+    { name: "Erika Workspace", type: "Personal", icon: User, color: "cyan" },
+    { name: "TechCorp Security", type: "Team", icon: Users, color: "blue" },
   ]
+
+  const handleLeaveWorkspace = (workspaceName: string) => {
+    if (workspaceName !== "Erika Workspace") {
+      console.log(`Leaving workspace: ${workspaceName}`)
+      if (currentWorkspace === workspaceName) {
+        setCurrentWorkspace("Erika Workspace")
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Sidebar */}
-      <div className="fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border">
-        {/* Logo */}
+      <div
+        className={`fixed inset-y-0 left-0 z-50 bg-card border-r border-border transition-all duration-300 ${
+          mainSidebarCollapsed ? "w-16" : "w-64"
+        }`}
+      >
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setMainSidebarCollapsed(!mainSidebarCollapsed)}
+          className="absolute -right-10 top-1/2 transform -translate-y-1/2 bg-white dark:bg-card border rounded-l-none rounded-r-lg h-12 w-10 p-0 shadow-md z-10"
+        >
+          {mainSidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        </Button>
+
         <div className="flex h-16 items-center px-6 border-b border-border">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
+          {mainSidebarCollapsed ? (
+            <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg flex items-center justify-center mx-auto">
+              <Zap className="w-5 h-5 text-white" />
             </div>
-            <div>
-              <span className="text-lg font-bold text-foreground">The SamurAI</span>
-              <span className="text-lg font-bold bg-gradient-to-r from-cyan-500 to-teal-500 bg-clip-text text-transparent ml-1">
-                DOJO
-              </span>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg flex items-center justify-center">
+                <Zap className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <span className="text-lg font-bold text-foreground">The SamurAI</span>
+                <span className="text-lg font-bold bg-gradient-to-r from-cyan-500 to-teal-500 bg-clip-text text-transparent ml-1">
+                  DOJO
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Navigation */}
         <nav className="mt-6 px-3">
           <ul className="space-y-1">
             {navigation.map((item) => {
@@ -90,10 +118,11 @@ export default function DashboardLayout({
                       isActive
                         ? "bg-gradient-to-r from-cyan-500/10 to-teal-500/10 text-cyan-600 dark:text-cyan-400"
                         : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                    }`}
+                    } ${mainSidebarCollapsed ? "justify-center" : ""}`}
+                    title={mainSidebarCollapsed ? item.name : undefined}
                   >
-                    <item.icon className="mr-3 h-5 w-5" />
-                    {item.name}
+                    <item.icon className={`h-5 w-5 ${mainSidebarCollapsed ? "" : "mr-3"}`} />
+                    {!mainSidebarCollapsed && item.name}
                   </Link>
                 </li>
               )
@@ -101,76 +130,94 @@ export default function DashboardLayout({
           </ul>
         </nav>
 
-        {/* Workspace Switcher Section */}
-        <div className="absolute bottom-4 left-3 right-3">
-          <div className="mb-4">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 mb-2">
-              Current Workspace
-            </p>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="w-full px-3 py-2 bg-accent/50 rounded-lg hover:bg-accent/70 transition-colors"
-                >
-                  <div className="flex items-center space-x-3 w-full">
-                    <div className="w-8 h-8 bg-cyan-100 dark:bg-cyan-900 rounded-full flex items-center justify-center">
-                      <Shield className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-                    </div>
-                    <div className="flex-1 min-w-0 text-left">
-                      <p className="text-sm font-medium text-foreground truncate">{currentWorkspace}</p>
-                      <p className="text-xs text-muted-foreground truncate">Personal</p>
-                    </div>
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="start" side="top">
-                {workspaces.map((workspace) => (
-                  <DropdownMenuItem
-                    key={workspace.name}
-                    className="cursor-pointer p-3"
-                    onClick={() => setCurrentWorkspace(workspace.name)}
+        {!mainSidebarCollapsed && (
+          <div className="absolute bottom-4 left-3 right-3">
+            <div className="mb-4">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 mb-2">
+                Current Workspace
+              </p>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-full px-3 py-2 bg-accent/50 rounded-lg hover:bg-accent/70 transition-colors"
                   >
                     <div className="flex items-center space-x-3 w-full">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          workspace.color === "cyan"
-                            ? "bg-cyan-100 dark:bg-cyan-900"
-                            : "bg-orange-100 dark:bg-orange-900"
-                        }`}
-                      >
-                        <workspace.icon
-                          className={`w-4 h-4 ${
-                            workspace.color === "cyan"
-                              ? "text-cyan-600 dark:text-cyan-400"
-                              : "text-orange-600 dark:text-orange-400"
-                          }`}
-                        />
+                      <div className="w-8 h-8 bg-cyan-100 dark:bg-cyan-900 rounded-full flex items-center justify-center">
+                        <User className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{workspace.name}</p>
-                        <p className="text-xs text-muted-foreground truncate">{workspace.type}</p>
+                      <div className="flex-1 min-w-0 text-left">
+                        <p className="text-sm font-medium text-foreground truncate">{currentWorkspace}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {workspaces.find((w) => w.name === currentWorkspace)?.type || "Personal"}
+                        </p>
                       </div>
-                      {currentWorkspace === workspace.name && <CheckCircle className="w-4 h-4 text-cyan-500" />}
                     </div>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="start" side="top">
+                  {workspaces.map((workspace) => (
+                    <DropdownMenuItem
+                      key={workspace.name}
+                      className="cursor-pointer p-3"
+                      onClick={() => setCurrentWorkspace(workspace.name)}
+                    >
+                      <div className="flex items-center space-x-3 w-full">
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                            workspace.color === "cyan" ? "bg-cyan-100 dark:bg-cyan-900" : "bg-blue-100 dark:bg-blue-900"
+                          }`}
+                        >
+                          <workspace.icon
+                            className={`w-4 h-4 ${
+                              workspace.color === "cyan"
+                                ? "text-cyan-600 dark:text-cyan-400"
+                                : "text-blue-600 dark:text-blue-400"
+                            }`}
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{workspace.name}</p>
+                          <p className="text-xs text-muted-foreground truncate">{workspace.type}</p>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          {currentWorkspace === workspace.name && <CheckCircle className="w-4 h-4 text-cyan-500" />}
+                          {workspace.type === "Team" && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0 hover:bg-red-100 dark:hover:bg-red-900/50"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleLeaveWorkspace(workspace.name)
+                              }}
+                            >
+                              <Trash2 className="w-3 h-3 text-red-500" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
 
-          {/* Branding Footer */}
-          <div className="text-center py-2 border-t border-border/50">
-            <p className="text-xs text-muted-foreground">© 2025 SamurAI DOJO Inc.</p>
+            <div className="text-center py-2 border-t border-border/50">
+              <p className="text-xs text-muted-foreground">© 2025 SamurAI DOJO Inc.</p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Main Content */}
-      <div className="pl-64">
-        {/* Header */}
+      <div className={`transition-all duration-300 ${mainSidebarCollapsed ? "pl-16" : "pl-64"}`}>
         <header className="h-16 bg-background border-b border-border flex items-center justify-between px-6">
-          <div>
+          <div className="flex items-center space-x-4">
+            {mainSidebarCollapsed && (
+              <Button variant="ghost" size="sm" onClick={() => setMainSidebarCollapsed(false)} className="lg:hidden">
+                <Menu className="h-4 w-4" />
+              </Button>
+            )}
             <h1 className="text-xl font-semibold text-foreground">
               {navigation.find((item) => item.href === pathname)?.name || "Dashboard"}
             </h1>
@@ -182,13 +229,11 @@ export default function DashboardLayout({
               <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
             </Button>
 
-            {/* Theme Toggle */}
             <Button variant="ghost" size="sm" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
               <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             </Button>
 
-            {/* User Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -282,7 +327,6 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        {/* Page Content */}
         <main className="p-6">{children}</main>
       </div>
     </div>

@@ -8,53 +8,146 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Shield,
-  Users,
-  Settings,
-  Mail,
-  Plus,
-  Activity,
-  BarChart3,
-  Sparkles,
-  CheckCircle,
-  Building,
-  X,
-} from "lucide-react"
+import { Shield, Users, Plus, BarChart3, X, Sparkles, CheckCircle2, Edit } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+interface InvitedMember {
+  email: string
+  role: string
+}
 
 export default function WorkspacesPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [workspaceToDelete, setWorkspaceToDelete] = useState<string | null>(null)
+  const [editingWorkspace, setEditingWorkspace] = useState<string | null>(null)
   const [workspaceName, setWorkspaceName] = useState("")
   const [workspaceDescription, setWorkspaceDescription] = useState("")
-  const [inviteEmails, setInviteEmails] = useState<string[]>([])
+  const [invitedMembers, setInvitedMembers] = useState<InvitedMember[]>([])
   const [currentEmail, setCurrentEmail] = useState("")
-  const [selectedCompliance, setSelectedCompliance] = useState([
-    "NCA Critical Infrastructure Framework",
-    "PDPL",
-    "ISO 27001",
-  ])
-  const [securityFocus, setSecurityFocus] = useState(["Endpoint Protection", "Network Security"])
-  const [utilityFocus, setUtilityFocus] = useState(["Productivity Tools"])
+  const [currentRole, setCurrentRole] = useState("viewer")
+
+  const [securityFocus, setSecurityFocus] = useState<string[]>(["endpoint-protection", "network-security"])
+  const [businessFocus, setBusinessFocus] = useState<string[]>(["productivity-tools"])
+  const [complianceStandards, setComplianceStandards] = useState<string[]>(["iso-27001", "nca-framework"])
 
   const handleEmailKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && currentEmail.trim()) {
       e.preventDefault()
       const email = currentEmail.trim()
-      if (email.includes("@mercygeneral.com") && !inviteEmails.includes(email)) {
-        setInviteEmails([...inviteEmails, email])
+      if (email.includes("@mercygeneral.com") && !invitedMembers.find((m) => m.email === email)) {
+        setInvitedMembers([...invitedMembers, { email, role: currentRole }])
         setCurrentEmail("")
+        setCurrentRole("viewer")
       }
     }
   }
 
-  const removeEmail = (emailToRemove: string) => {
-    setInviteEmails(inviteEmails.filter((email) => email !== emailToRemove))
+  const removeMember = (emailToRemove: string) => {
+    setInvitedMembers(invitedMembers.filter((member) => member.email !== emailToRemove))
   }
+
+  const updateMemberRole = (email: string, newRole: string) => {
+    setInvitedMembers(invitedMembers.map((member) => (member.email === email ? { ...member, role: newRole } : member)))
+  }
+
+  const toggleFocus = (category: "security" | "business", item: string) => {
+    if (category === "security") {
+      setSecurityFocus((prev) => (prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]))
+    } else {
+      setBusinessFocus((prev) => (prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]))
+    }
+  }
+
+  const toggleCompliance = (standard: string) => {
+    setComplianceStandards((prev) =>
+      prev.includes(standard) ? prev.filter((s) => s !== standard) : [...prev, standard],
+    )
+  }
+
+  const openEditDialog = (workspaceId: string) => {
+    setEditingWorkspace(workspaceId)
+    if (workspaceId === "personal") {
+      setWorkspaceName("Erika Workspace")
+      setWorkspaceDescription("Your personal workspace for professional tools and analysis")
+    } else {
+      setWorkspaceName("TechCorp Security")
+      setWorkspaceDescription("Team workspace for security analysis and collaboration")
+      setInvitedMembers([
+        { email: "john.doe@mercygeneral.com", role: "editor" },
+        { email: "sarah.smith@mercygeneral.com", role: "viewer" },
+        { email: "mike.johnson@mercygeneral.com", role: "admin" },
+      ])
+    }
+    setIsEditOpen(true)
+  }
+
+  const handleDeleteWorkspace = (workspaceName: string) => {
+    setWorkspaceToDelete(workspaceName)
+    setIsDeleteOpen(true)
+  }
+
+  const confirmDeleteWorkspace = () => {
+    console.log(`Deleting workspace: ${workspaceToDelete}`)
+    // Here you would actually delete the workspace
+    setIsDeleteOpen(false)
+    setWorkspaceToDelete(null)
+  }
+
+  const securityFocusOptions = [
+    { id: "endpoint-protection", label: "Endpoint Protection", description: "Device security and threat detection" },
+    { id: "network-security", label: "Network Security", description: "Firewall, IDS/IPS, and network monitoring" },
+    { id: "data-protection", label: "Data Protection", description: "Encryption, DLP, and data governance" },
+    { id: "identity-management", label: "Identity Management", description: "IAM, SSO, and access controls" },
+    { id: "cloud-security", label: "Cloud Security", description: "Cloud infrastructure and service security" },
+    { id: "compliance-management", label: "Compliance Management", description: "Regulatory compliance and auditing" },
+  ]
+
+  const businessFocusOptions = [
+    { id: "productivity-tools", label: "Productivity Tools", description: "Office suites, collaboration platforms" },
+    {
+      id: "communication-platforms",
+      label: "Communication Platforms",
+      description: "Messaging, video conferencing, VoIP",
+    },
+    {
+      id: "business-analytics",
+      label: "Business Analytics",
+      description: "BI tools, reporting, and data visualization",
+    },
+    { id: "process-automation", label: "Process Automation", description: "Workflow automation and RPA tools" },
+    { id: "team-collaboration", label: "Team Collaboration", description: "Project management and team tools" },
+    { id: "it-infrastructure", label: "IT Infrastructure", description: "Servers, networking, and system management" },
+  ]
+
+  const complianceOptions = [
+    { id: "iso-27001", label: "ISO 27001", description: "Information security management", detected: true },
+    {
+      id: "nca-framework",
+      label: "NCA Critical Infrastructure Framework",
+      description: "Philippines critical infrastructure",
+      detected: true,
+    },
+    { id: "pdpl", label: "PDPL", description: "Philippines Data Privacy Law", detected: true },
+    { id: "hipaa", label: "HIPAA", description: "Healthcare information privacy" },
+    { id: "gdpr", label: "GDPR", description: "European data protection regulation" },
+    { id: "sox", label: "SOX", description: "Sarbanes-Oxley financial compliance" },
+    { id: "pci-dss", label: "PCI DSS", description: "Payment card industry security" },
+    { id: "nist", label: "NIST Framework", description: "Cybersecurity framework" },
+    { id: "iso-22301", label: "ISO 22301", description: "Business continuity management" },
+    { id: "iso-31000", label: "ISO 31000", description: "Risk management principles" },
+    { id: "cobit", label: "COBIT", description: "IT governance and management" },
+    { id: "itil", label: "ITIL", description: "IT service management" },
+    { id: "coso", label: "COSO", description: "Internal control framework" },
+    { id: "fisma", label: "FISMA", description: "Federal information security" },
+    { id: "fedramp", label: "FedRAMP", description: "Federal cloud security" },
+    { id: "ccpa", label: "CCPA", description: "California consumer privacy" },
+  ]
 
   return (
     <div className="space-y-6">
@@ -62,242 +155,582 @@ export default function WorkspacesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Workspace Management</h1>
-          <p className="text-muted-foreground">Manage your workspaces, team members, and settings</p>
+          <p className="text-muted-foreground">Manage your workspaces and team collaboration</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-cyan-500 to-teal-500">
+            <Button className="bg-gradient-to-r from-cyan-500 to-blue-500">
               <Plus className="w-4 h-4 mr-2" />
               Create Workspace
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create New Workspace</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="workspace-name">Workspace Name</Label>
-                <Input
-                  id="workspace-name"
-                  placeholder="e.g., Marketing SecOps, Finance Team"
-                  value={workspaceName}
-                  onChange={(e) => setWorkspaceName(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">Choose a descriptive name for your team or project</p>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="workspace-description">Description (Optional)</Label>
-                <Textarea
-                  id="workspace-description"
-                  placeholder="Brief description of this workspace's purpose..."
-                  value={workspaceDescription}
-                  onChange={(e) => setWorkspaceDescription(e.target.value)}
-                  rows={3}
-                />
-              </div>
+            <Tabs defaultValue="team" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="team">Roles & Members</TabsTrigger>
+                <TabsTrigger value="focus">Focus Areas</TabsTrigger>
+                <TabsTrigger value="standards">Standards</TabsTrigger>
+              </TabsList>
 
-              <div className="space-y-2">
-                <Label htmlFor="invite-emails">Invite Team Members</Label>
-                <div className="space-y-2">
-                  <Input
-                    id="invite-emails"
-                    placeholder="Type email and press Enter to add..."
-                    value={currentEmail}
-                    onChange={(e) => setCurrentEmail(e.target.value)}
-                    onKeyPress={handleEmailKeyPress}
-                  />
-                  {inviteEmails.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {inviteEmails.map((email, index) => (
-                        <Badge key={index} variant="secondary" className="flex items-center gap-1">
-                          {email}
-                          <X className="w-3 h-3 cursor-pointer hover:text-red-500" onClick={() => removeEmail(email)} />
+              <TabsContent value="team" className="space-y-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="workspace-name">Workspace Name</Label>
+                    <Input
+                      id="workspace-name"
+                      placeholder="e.g., Marketing Team, Finance Professional"
+                      value={workspaceName}
+                      onChange={(e) => setWorkspaceName(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="workspace-description">Description (Optional)</Label>
+                    <Textarea
+                      id="workspace-description"
+                      placeholder="Brief description of this workspace's purpose..."
+                      value={workspaceDescription}
+                      onChange={(e) => setWorkspaceDescription(e.target.value)}
+                      rows={2}
+                    />
+                  </div>
+
+                  <div className="space-y-4">
+                    <Label>Team Members & Roles</Label>
+
+                    <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-medium text-blue-600">E</span>
+                          </div>
+                          <div>
+                            <div className="font-medium">erika@mercygeneral.com</div>
+                            <div className="text-sm text-muted-foreground">You</div>
+                          </div>
+                        </div>
+                        <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                          Admin
                         </Badge>
-                      ))}
+                      </div>
+                    </div>
+
+                    {/* Add Members */}
+                    <div className="space-y-3">
+                      <div className="flex space-x-2">
+                        <Input
+                          placeholder="Enter team member email..."
+                          value={currentEmail}
+                          onChange={(e) => setCurrentEmail(e.target.value)}
+                          onKeyPress={handleEmailKeyPress}
+                          className="flex-1"
+                        />
+                        <Select value={currentRole} onValueChange={setCurrentRole}>
+                          <SelectTrigger className="w-32">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="viewer">Viewer</SelectItem>
+                            <SelectItem value="editor">Editor</SelectItem>
+                            <SelectItem value="admin">Admin</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3 text-xs">
+                        <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded">
+                          <div className="font-medium text-gray-700 dark:text-gray-300">Viewer</div>
+                          <div className="text-gray-500">View labs, reports, and searches</div>
+                        </div>
+                        <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded">
+                          <div className="font-medium text-gray-700 dark:text-gray-300">Editor</div>
+                          <div className="text-gray-500">Create and modify content</div>
+                        </div>
+                        <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded">
+                          <div className="font-medium text-gray-700 dark:text-gray-300">Admin</div>
+                          <div className="text-gray-500">Full workspace management</div>
+                        </div>
+                      </div>
+
+                      {/* Invited Members List */}
+                      {invitedMembers.length > 0 && (
+                        <div className="space-y-2">
+                          <Label className="text-sm">Invited Members</Label>
+                          {invitedMembers.map((member, index) => (
+                            <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                                  <span className="text-sm font-medium">{member.email[0].toUpperCase()}</span>
+                                </div>
+                                <span className="font-medium">{member.email}</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Select
+                                  value={member.role}
+                                  onValueChange={(role) => updateMemberRole(member.email, role)}
+                                >
+                                  <SelectTrigger className="w-24">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="viewer">Viewer</SelectItem>
+                                    <SelectItem value="editor">Editor</SelectItem>
+                                    <SelectItem value="admin">Admin</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Button variant="ghost" size="sm" onClick={() => removeMember(member.email)}>
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="focus" className="space-y-6">
+                {/* Security Focus Areas */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Shield className="w-5 h-5 text-blue-500" />
+                    <Label className="text-base font-medium">Protection & Verification Focus</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Select areas where you evaluate protection and verification solutions
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {securityFocusOptions.map((option) => (
+                      <div
+                        key={option.id}
+                        className={`p-3 border rounded-lg cursor-pointer transition-all ${
+                          securityFocus.includes(option.id)
+                            ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
+                            : "border-gray-200 hover:border-blue-300"
+                        }`}
+                        onClick={() => toggleFocus("security", option.id)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <div className="font-medium">{option.label}</div>
+                            {securityFocus.includes(option.id) && <CheckCircle2 className="w-4 h-4 text-blue-500" />}
+                          </div>
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">{option.description}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Business Utility Focus */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <BarChart3 className="w-5 h-5 text-blue-500" />
+                    <Label className="text-base font-medium">Business Utility Focus</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Select business tools and utilities you evaluate</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {businessFocusOptions.map((option) => (
+                      <div
+                        key={option.id}
+                        className={`p-3 border rounded-lg cursor-pointer transition-all ${
+                          businessFocus.includes(option.id)
+                            ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
+                            : "border-gray-200 hover:border-blue-300"
+                        }`}
+                        onClick={() => toggleFocus("business", option.id)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <div className="font-medium">{option.label}</div>
+                            {businessFocus.includes(option.id) && <CheckCircle2 className="w-4 h-4 text-blue-500" />}
+                          </div>
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">{option.description}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="standards" className="space-y-6">
+                {/* Professional Standards */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Sparkles className="w-5 h-5 text-blue-500" />
+                    <Label className="text-base font-medium">Professional Standards</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Based on your industry (Healthcare) and location (Asia • Philippines), we've highlighted relevant
+                    standards.
+                  </p>
+
+                  <div className="space-y-3">
+                    <div className="text-sm font-medium text-blue-600">Recommended for your context:</div>
+                    <div className="grid grid-cols-1 gap-2">
+                      {complianceOptions
+                        .filter((option) => option.detected)
+                        .map((option) => (
+                          <div
+                            key={option.id}
+                            className={`p-2 border rounded cursor-pointer transition-all ${
+                              complianceStandards.includes(option.id)
+                                ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
+                                : "border-blue-200 bg-blue-25"
+                            }`}
+                            onClick={() => toggleCompliance(option.id)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <Sparkles className="w-3 h-3 text-blue-500" />
+                                <div className="text-sm font-medium">{option.label}</div>
+                                {complianceStandards.includes(option.id) && (
+                                  <CheckCircle2 className="w-3 h-3 text-blue-500" />
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1 ml-5">{option.description}</div>
+                          </div>
+                        ))}
+                    </div>
+
+                    <div className="text-sm font-medium text-gray-600 mt-6">Additional standards (if applicable):</div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {complianceOptions
+                        .filter((option) => !option.detected)
+                        .map((option) => (
+                          <div
+                            key={option.id}
+                            className={`p-2 border rounded cursor-pointer transition-all ${
+                              complianceStandards.includes(option.id)
+                                ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
+                                : "border-gray-200 hover:border-blue-300"
+                            }`}
+                            onClick={() => toggleCompliance(option.id)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-1">
+                                <div className="text-sm font-medium">{option.label}</div>
+                                {complianceStandards.includes(option.id) && (
+                                  <CheckCircle2 className="w-3 h-3 text-blue-500" />
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1">{option.description}</div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+
+            <div className="flex space-x-2 pt-4 border-t">
+              <Button variant="outline" className="flex-1 bg-transparent" onClick={() => setIsCreateOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500"
+                onClick={() => {
+                  setIsCreateOpen(false)
+                  // Reset form
+                  setWorkspaceName("")
+                  setWorkspaceDescription("")
+                  setInvitedMembers([])
+                  setCurrentEmail("")
+                  setCurrentRole("viewer")
+                  setSecurityFocus(["endpoint-protection", "network-security"])
+                  setBusinessFocus(["productivity-tools"])
+                  setComplianceStandards(["iso-27001", "nca-framework"])
+                }}
+              >
+                Create Workspace
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+          <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Edit Workspace</DialogTitle>
+            </DialogHeader>
+
+            <Tabs defaultValue="team" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="team">Roles & Members</TabsTrigger>
+                <TabsTrigger value="focus">Focus Areas</TabsTrigger>
+                <TabsTrigger value="standards">Standards</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="team" className="space-y-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-workspace-name">Workspace Name</Label>
+                    <Input
+                      id="edit-workspace-name"
+                      value={workspaceName}
+                      onChange={(e) => setWorkspaceName(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-workspace-description">Description</Label>
+                    <Textarea
+                      id="edit-workspace-description"
+                      value={workspaceDescription}
+                      onChange={(e) => setWorkspaceDescription(e.target.value)}
+                      rows={2}
+                    />
+                  </div>
+
+                  {editingWorkspace !== "personal" && (
+                    <div className="space-y-4">
+                      <Label>Team Members & Roles</Label>
+
+                      <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                              <span className="text-sm font-medium text-blue-600">E</span>
+                            </div>
+                            <div>
+                              <div className="font-medium">erika@mercygeneral.com</div>
+                              <div className="text-sm text-muted-foreground">You (Owner)</div>
+                            </div>
+                          </div>
+                          <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                            Admin
+                          </Badge>
+                        </div>
+                      </div>
+
+                      {invitedMembers.length > 0 && (
+                        <div className="space-y-2">
+                          <Label className="text-sm">Team Members</Label>
+                          {invitedMembers.map((member, index) => (
+                            <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                                  <span className="text-sm font-medium">{member.email[0].toUpperCase()}</span>
+                                </div>
+                                <span className="font-medium">{member.email}</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Select
+                                  value={member.role}
+                                  onValueChange={(role) => updateMemberRole(member.email, role)}
+                                >
+                                  <SelectTrigger className="w-24">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="viewer">Viewer</SelectItem>
+                                    <SelectItem value="editor">Editor</SelectItem>
+                                    <SelectItem value="admin">Admin</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Button variant="ghost" size="sm" onClick={() => removeMember(member.email)}>
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Only emails from your domain (@mercygeneral.com) can be invited. Users will get access when they sign
-                  up.
-                </p>
-              </div>
+              </TabsContent>
 
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <Sparkles className="w-4 h-4 text-cyan-500" />
-                  <span className="text-sm font-medium">Professional Standards</span>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  Based on your industry (Healthcare) and location (Asia • Philippines). You can modify these for this
-                  workspace.
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-sm font-medium text-cyan-600">Recommended for your context:</div>
-                  <div className="space-y-2">
-                    {["NCA Critical Infrastructure Framework", "PDPL", "ISO 27001"].map((standard) => (
-                      <div
-                        key={standard}
-                        className="flex items-center space-x-2 p-2 bg-cyan-50 dark:bg-cyan-950 rounded border border-cyan-200 dark:border-cyan-800"
-                      >
-                        <Checkbox
-                          checked={selectedCompliance.includes(standard)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setSelectedCompliance([...selectedCompliance, standard])
-                            } else {
-                              setSelectedCompliance(selectedCompliance.filter((s) => s !== standard))
-                            }
-                          }}
-                        />
-                        <span className="text-sm">{standard}</span>
-                        <Sparkles className="w-3 h-3 text-cyan-500 ml-auto" />
-                      </div>
-                    ))}
+              <TabsContent value="focus" className="space-y-6">
+                {/* Same focus areas content as create dialog */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Shield className="w-5 h-5 text-blue-500" />
+                    <Label className="text-base font-medium">Protection & Verification Focus</Label>
                   </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-sm font-medium">Additional standards (if applicable):</div>
-                  <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
-                    {[
-                      "ABNT Standards",
-                      "ACPR Guidelines",
-                      "ACSC Guidelines",
-                      "ANSSI Framework",
-                      "BDSG",
-                      "BCB Guidelines",
-                      "BSI C5",
-                      "BaFin Guidelines",
-                      "BIS Standards",
-                    ].map((standard) => (
-                      <div key={standard} className="flex items-center space-x-2">
-                        <Checkbox
-                          checked={selectedCompliance.includes(standard)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setSelectedCompliance([...selectedCompliance, standard])
-                            } else {
-                              setSelectedCompliance(selectedCompliance.filter((s) => s !== standard))
-                            }
-                          }}
-                        />
-                        <span className="text-xs">{standard}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Shield className="w-4 h-4 text-cyan-500" />
-                  <span className="text-sm font-medium">Usage Focus Areas</span>
-                </div>
-
-                <div>
-                  <div className="text-sm font-medium text-cyan-600 mb-2">Healthcare Security Path</div>
-                  <div className="text-xs text-muted-foreground mb-2">
+                  <p className="text-sm text-muted-foreground">
                     Select areas where you evaluate protection and verification solutions
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      "Endpoint Protection",
-                      "Network Security",
-                      "Data Protection",
-                      "Cloud Security",
-                      "Identity Management",
-                      "Compliance Management",
-                    ].map((area) => (
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {securityFocusOptions.map((option) => (
                       <div
-                        key={area}
-                        className={`p-2 border rounded text-xs cursor-pointer transition-colors ${
-                          securityFocus.includes(area)
-                            ? "bg-cyan-50 dark:bg-cyan-950 border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-300"
-                            : "hover:bg-accent/50"
+                        key={option.id}
+                        className={`p-3 border rounded-lg cursor-pointer transition-all ${
+                          securityFocus.includes(option.id)
+                            ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
+                            : "border-gray-200 hover:border-blue-300"
                         }`}
-                        onClick={() => {
-                          if (securityFocus.includes(area)) {
-                            setSecurityFocus(securityFocus.filter((f) => f !== area))
-                          } else {
-                            setSecurityFocus([...securityFocus, area])
-                          }
-                        }}
+                        onClick={() => toggleFocus("security", option.id)}
                       >
-                        <div className="flex items-center space-x-2">
-                          <Shield className="w-3 h-3" />
-                          <span>{area}</span>
-                          {securityFocus.includes(area) && <CheckCircle className="w-3 h-3 ml-auto" />}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <div className="font-medium">{option.label}</div>
+                            {securityFocus.includes(option.id) && <CheckCircle2 className="w-4 h-4 text-blue-500" />}
+                          </div>
                         </div>
+                        <div className="text-sm text-muted-foreground mt-1">{option.description}</div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div>
-                  <div className="text-sm font-medium text-orange-600 mb-2">Business Utility Focus</div>
-                  <div className="text-xs text-muted-foreground mb-2">
-                    Select business tools and utilities you evaluate
+                {/* Business Utility Focus */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <BarChart3 className="w-5 h-5 text-blue-500" />
+                    <Label className="text-base font-medium">Business Utility Focus</Label>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      "Productivity Tools",
-                      "Communication Platforms",
-                      "Business Analytics",
-                      "Process Automation",
-                      "Team Collaboration",
-                      "IT Infrastructure",
-                    ].map((area) => (
+                  <p className="text-sm text-muted-foreground">Select business tools and utilities you evaluate</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {businessFocusOptions.map((option) => (
                       <div
-                        key={area}
-                        className={`p-2 border rounded text-xs cursor-pointer transition-colors ${
-                          utilityFocus.includes(area)
-                            ? "bg-orange-50 dark:bg-orange-950 border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-300"
-                            : "hover:bg-accent/50"
+                        key={option.id}
+                        className={`p-3 border rounded-lg cursor-pointer transition-all ${
+                          businessFocus.includes(option.id)
+                            ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
+                            : "border-gray-200 hover:border-blue-300"
                         }`}
-                        onClick={() => {
-                          if (utilityFocus.includes(area)) {
-                            setUtilityFocus(utilityFocus.filter((f) => f !== area))
-                          } else {
-                            setUtilityFocus([...utilityFocus, area])
-                          }
-                        }}
+                        onClick={() => toggleFocus("business", option.id)}
                       >
-                        <div className="flex items-center space-x-2">
-                          <Building className="w-3 h-3" />
-                          <span>{area}</span>
-                          {utilityFocus.includes(area) && <CheckCircle className="w-3 h-3 ml-auto" />}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <div className="font-medium">{option.label}</div>
+                            {businessFocus.includes(option.id) && <CheckCircle2 className="w-4 h-4 text-blue-500" />}
+                          </div>
                         </div>
+                        <div className="text-sm text-muted-foreground mt-1">{option.description}</div>
                       </div>
                     ))}
                   </div>
                 </div>
-              </div>
+              </TabsContent>
 
-              <div className="flex space-x-2">
-                <Button variant="outline" className="flex-1 bg-transparent" onClick={() => setIsCreateOpen(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  className="flex-1 bg-gradient-to-r from-cyan-500 to-teal-500"
-                  onClick={() => {
-                    // Handle workspace creation
-                    setIsCreateOpen(false)
-                    setWorkspaceName("")
-                    setWorkspaceDescription("")
-                    setInviteEmails([])
-                    setCurrentEmail("")
-                    setSelectedCompliance(["NCA Critical Infrastructure Framework", "PDPL", "ISO 27001"])
-                    setSecurityFocus(["Endpoint Protection", "Network Security"])
-                    setUtilityFocus(["Productivity Tools"])
-                  }}
-                >
-                  Create Workspace
-                </Button>
+              <TabsContent value="standards" className="space-y-6">
+                {/* Same standards content as create dialog */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Sparkles className="w-5 h-5 text-blue-500" />
+                    <Label className="text-base font-medium">Professional Standards</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Based on your industry (Healthcare) and location (Asia • Philippines), we've highlighted relevant
+                    standards.
+                  </p>
+
+                  <div className="space-y-3">
+                    <div className="text-sm font-medium text-blue-600">Recommended for your context:</div>
+                    <div className="grid grid-cols-1 gap-2">
+                      {complianceOptions
+                        .filter((option) => option.detected)
+                        .map((option) => (
+                          <div
+                            key={option.id}
+                            className={`p-2 border rounded cursor-pointer transition-all ${
+                              complianceStandards.includes(option.id)
+                                ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
+                                : "border-blue-200 bg-blue-25"
+                            }`}
+                            onClick={() => toggleCompliance(option.id)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <Sparkles className="w-3 h-3 text-blue-500" />
+                                <div className="text-sm font-medium">{option.label}</div>
+                                {complianceStandards.includes(option.id) && (
+                                  <CheckCircle2 className="w-3 h-3 text-blue-500" />
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1 ml-5">{option.description}</div>
+                          </div>
+                        ))}
+                    </div>
+
+                    <div className="text-sm font-medium text-gray-600 mt-6">Additional standards (if applicable):</div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {complianceOptions
+                        .filter((option) => !option.detected)
+                        .map((option) => (
+                          <div
+                            key={option.id}
+                            className={`p-2 border rounded cursor-pointer transition-all ${
+                              complianceStandards.includes(option.id)
+                                ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
+                                : "border-gray-200 hover:border-blue-300"
+                            }`}
+                            onClick={() => toggleCompliance(option.id)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-1">
+                                <div className="text-sm font-medium">{option.label}</div>
+                                {complianceStandards.includes(option.id) && (
+                                  <CheckCircle2 className="w-3 h-3 text-blue-500" />
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1">{option.description}</div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+
+            <div className="flex space-x-2 pt-4 border-t">
+              <Button variant="outline" className="flex-1 bg-transparent" onClick={() => setIsEditOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500"
+                onClick={() => {
+                  setIsEditOpen(false)
+                  setEditingWorkspace(null)
+                }}
+              >
+                Save Changes
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-red-600">Delete Workspace</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Are you sure you want to delete <strong>{workspaceToDelete}</strong>? This action cannot be undone.
+              </p>
+              <div className="bg-red-50 dark:bg-red-950 p-3 rounded-lg">
+                <div className="text-sm text-red-800 dark:text-red-200">
+                  <strong>This will permanently delete:</strong>
+                  <ul className="list-disc list-inside mt-2 space-y-1">
+                    <li>All lab environments and configurations</li>
+                    <li>Product search history and saved results</li>
+                    <li>Team member access and permissions</li>
+                    <li>Reports and analysis data</li>
+                  </ul>
+                </div>
               </div>
+            </div>
+            <div className="flex space-x-2 pt-4">
+              <Button variant="outline" className="flex-1 bg-transparent" onClick={() => setIsDeleteOpen(false)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" className="flex-1" onClick={confirmDeleteWorkspace}>
+                Delete Workspace
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -330,7 +763,7 @@ export default function WorkspacesPage() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center space-x-2">
-              <BarChart3 className="h-8 w-8 text-green-500" />
+              <BarChart3 className="h-8 w-8 text-blue-500" />
               <div>
                 <div className="text-2xl font-bold">15</div>
                 <div className="text-sm text-muted-foreground">Active Labs</div>
@@ -340,10 +773,9 @@ export default function WorkspacesPage() {
         </Card>
       </div>
 
-      {/* Workspace Cards */}
+      {/* Simplified Workspace Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Erika SecOps Workspace */}
-        <Card>
+        <Card className="cursor-pointer hover:shadow-lg transition-shadow">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -352,310 +784,100 @@ export default function WorkspacesPage() {
                 </div>
                 <div>
                   <CardTitle className="flex items-center space-x-2">
-                    <span>Erika SecOps</span>
+                    <span>Erika Workspace</span>
                     <Badge variant="secondary">Personal</Badge>
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">Your default workspace</p>
                 </div>
               </div>
-              <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4" />
+              <Button variant="outline" size="sm" onClick={() => openEditDialog("personal")}>
+                <Edit className="w-4 h-4" />
               </Button>
             </div>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="members">Members</TabsTrigger>
-                <TabsTrigger value="compliance">Compliance</TabsTrigger>
-                <TabsTrigger value="focus">Focus Areas</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="overview" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-accent/50 rounded-lg">
-                    <div className="text-sm font-medium">Resource Usage</div>
-                    <div className="text-2xl font-bold text-cyan-600">6.5 GB</div>
-                    <Progress value={65} className="h-2 mt-1" />
-                  </div>
-                  <div className="p-3 bg-accent/50 rounded-lg">
-                    <div className="text-sm font-medium">Active Resources</div>
-                    <div className="text-2xl font-bold text-blue-600">5</div>
-                    <div className="text-xs text-muted-foreground">2 VMs, 1 Browser, 2 Tools</div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span>Recent Activity</span>
-                    <Badge variant="outline">
-                      <Activity className="w-3 h-3 mr-1" />
-                      Active
-                    </Badge>
-                  </div>
-                  <div className="text-xs text-muted-foreground">Last search: SOAR comparison (2h ago)</div>
-                  <div className="text-xs text-muted-foreground">Active: Firewall testing environment</div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="members" className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium">Team Members (1/5)</div>
-                  <Button size="sm" variant="outline">
-                    <Mail className="w-4 h-4 mr-1" />
-                    Invite
-                  </Button>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-3 p-2 border rounded">
-                    <div className="w-8 h-8 bg-cyan-100 dark:bg-cyan-900 rounded-full flex items-center justify-center">
-                      <span className="text-sm font-medium text-cyan-600">E</span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-sm">Erika (You)</div>
-                      <div className="text-xs text-muted-foreground">erika@company.com</div>
-                    </div>
-                    <Badge>Owner</Badge>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Input placeholder="Enter email to invite team member" />
-                  <div className="text-xs text-muted-foreground">
-                    Invited users will get access to this workspace's labs, searches, and reports.
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="compliance" className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <Sparkles className="w-4 h-4 text-cyan-500" />
-                    <span className="text-sm font-medium">Professional Standards</span>
-                  </div>
-                  <div className="text-xs text-muted-foreground mb-3">
-                    Based on your industry (Healthcare) and location (Asia • Philippines)
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium text-cyan-600">Recommended for your context:</div>
-                    <div className="space-y-2">
-                      {[
-                        { name: "NCA Critical Infrastructure Framework", checked: true },
-                        { name: "PDPL", checked: true },
-                        { name: "ISO 27001", checked: true },
-                      ].map((standard, i) => (
-                        <div
-                          key={i}
-                          className="flex items-center space-x-2 p-2 bg-cyan-50 dark:bg-cyan-950 rounded border border-cyan-200 dark:border-cyan-800"
-                        >
-                          <Checkbox checked={standard.checked} />
-                          <span className="text-sm">{standard.name}</span>
-                          <Sparkles className="w-3 h-3 text-cyan-500 ml-auto" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium">Additional standards (if applicable):</div>
-                    <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
-                      {[
-                        "ABNT Standards",
-                        "ACPR Guidelines",
-                        "ACSC Guidelines",
-                        "ANSSI Framework",
-                        "BDSG",
-                        "BCB Guidelines",
-                        "BSI C5",
-                        "BaFin Guidelines",
-                        "BIS Standards",
-                      ].map((standard, i) => (
-                        <div key={i} className="flex items-center space-x-2">
-                          <Checkbox />
-                          <span className="text-xs">{standard}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="focus" className="space-y-4">
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex items-center space-x-2 mb-3">
-                      <Shield className="w-4 h-4 text-cyan-500" />
-                      <span className="text-sm font-medium">Healthcare Security Path</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground mb-2">
-                      Select areas where you evaluate protection and verification solutions
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { name: "Endpoint Protection", selected: true },
-                        { name: "Network Security", selected: true },
-                        { name: "Data Protection", selected: false },
-                        { name: "Cloud Security", selected: false },
-                        { name: "Identity Management", selected: false },
-                        { name: "Compliance Management", selected: false },
-                      ].map((area, i) => (
-                        <div
-                          key={i}
-                          className={`p-2 border rounded text-xs cursor-pointer ${
-                            area.selected
-                              ? "bg-cyan-50 dark:bg-cyan-950 border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-300"
-                              : "hover:bg-accent/50"
-                          }`}
-                        >
-                          <div className="flex items-center space-x-2">
-                            <Shield className="w-3 h-3" />
-                            <span>{area.name}</span>
-                            {area.selected && <CheckCircle className="w-3 h-3 ml-auto" />}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center space-x-2 mb-3">
-                      <Building className="w-4 h-4 text-orange-500" />
-                      <span className="text-sm font-medium">Business Utility Focus</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground mb-2">
-                      Select business tools and utilities you evaluate
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { name: "Productivity Tools", selected: true },
-                        { name: "Communication Platforms", selected: false },
-                        { name: "Business Analytics", selected: false },
-                        { name: "Process Automation", selected: false },
-                        { name: "Team Collaboration", selected: false },
-                        { name: "IT Infrastructure", selected: false },
-                      ].map((area, i) => (
-                        <div
-                          key={i}
-                          className={`p-2 border rounded text-xs cursor-pointer ${
-                            area.selected
-                              ? "bg-orange-50 dark:bg-orange-950 border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-300"
-                              : "hover:bg-accent/50"
-                          }`}
-                        >
-                          <div className="flex items-center space-x-2">
-                            <Building className="w-3 h-3" />
-                            <span>{area.name}</span>
-                            {area.selected && <CheckCircle className="w-3 h-3 ml-auto" />}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <div className="text-center">
+                <div className="text-lg font-bold text-cyan-600">5</div>
+                <div className="text-xs text-muted-foreground">Active Labs</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-blue-600">12</div>
+                <div className="text-xs text-muted-foreground">Searches</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-blue-600">8</div>
+                <div className="text-xs text-muted-foreground">Reports</div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span>Resource Usage</span>
+                <span className="text-cyan-600 font-medium">6.5 GB</span>
+              </div>
+              <Progress value={65} className="h-2" />
+              <div className="text-xs text-muted-foreground">Last active: 2 hours ago</div>
+            </div>
           </CardContent>
         </Card>
 
         {/* TechCorp Security Workspace */}
-        <Card>
+        <Card className="cursor-pointer hover:shadow-lg transition-shadow">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6 text-orange-600" />
+                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                  <Users className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
                   <CardTitle className="flex items-center space-x-2">
                     <span>TechCorp Security</span>
                     <Badge variant="secondary">Team</Badge>
                   </CardTitle>
-                  <p className="text-sm text-muted-foreground">Shared team workspace</p>
+                  <p className="text-sm text-muted-foreground">5 team members</p>
                 </div>
               </div>
-              <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4" />
-              </Button>
+              <div className="flex items-center space-x-2">
+                <Button variant="outline" size="sm" onClick={() => openEditDialog("team")}>
+                  <Edit className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-950/50 bg-transparent"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleDeleteWorkspace("TechCorp Security")
+                  }}
+                >
+                  <X className="w-4 h-4 text-red-500" />
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="members">Members (5)</TabsTrigger>
-                <TabsTrigger value="activity">Activity</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="overview" className="space-y-4">
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="text-center p-3 bg-accent/50 rounded-lg">
-                    <div className="text-lg font-bold text-orange-600">18</div>
-                    <div className="text-xs text-muted-foreground">Active Resources</div>
-                  </div>
-                  <div className="text-center p-3 bg-accent/50 rounded-lg">
-                    <div className="text-lg font-bold text-blue-600">47</div>
-                    <div className="text-xs text-muted-foreground">Searches</div>
-                  </div>
-                  <div className="text-center p-3 bg-accent/50 rounded-lg">
-                    <div className="text-lg font-bold text-green-600">23</div>
-                    <div className="text-xs text-muted-foreground">Reports</div>
-                  </div>
-                </div>
-                <div className="p-3 bg-orange-50 dark:bg-orange-950 rounded-lg">
-                  <div className="text-sm font-medium text-orange-800 dark:text-orange-200">
-                    Network Security Testing - 25 minutes left
-                  </div>
-                  <Progress value={45} className="h-2 mt-2" />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="members" className="space-y-3">
-                <div className="space-y-2 max-h-40 overflow-y-auto">
-                  {[
-                    { name: "John Smith", email: "john@techcorp.com", role: "Admin", initial: "J" },
-                    { name: "Erika (You)", email: "erika@techcorp.com", role: "Member", initial: "E" },
-                    { name: "Sarah Wilson", email: "sarah@techcorp.com", role: "Member", initial: "S" },
-                    { name: "Mike Johnson", email: "mike@techcorp.com", role: "Member", initial: "M" },
-                    { name: "Lisa Chen", email: "lisa@techcorp.com", role: "Member", initial: "L" },
-                  ].map((member, i) => (
-                    <div key={i} className="flex items-center justify-between p-2 border rounded">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-6 h-6 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center">
-                          <span className="text-xs font-medium text-orange-600">{member.initial}</span>
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium">{member.name}</div>
-                          <div className="text-xs text-muted-foreground">{member.email}</div>
-                        </div>
-                      </div>
-                      <Badge variant={member.role === "Admin" ? "default" : "secondary"} className="text-xs">
-                        {member.role}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="activity" className="space-y-3">
-                <div className="space-y-2">
-                  {[
-                    { action: "Lab deployed", user: "John Smith", time: "2h ago", color: "green" },
-                    { action: "Report generated", user: "Sarah Wilson", time: "4h ago", color: "blue" },
-                    { action: "Search completed", user: "Mike Johnson", time: "6h ago", color: "orange" },
-                  ].map((activity, i) => (
-                    <div key={i} className="flex items-center space-x-3 p-2 border rounded">
-                      <div className={`w-2 h-2 bg-${activity.color}-500 rounded-full`}></div>
-                      <div className="flex-1">
-                        <div className="text-sm font-medium">{activity.action}</div>
-                        <div className="text-xs text-muted-foreground">
-                          by {activity.user} • {activity.time}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
-            </Tabs>
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <div className="text-center">
+                <div className="text-lg font-bold text-blue-600">18</div>
+                <div className="text-xs text-muted-foreground">Active Labs</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-blue-600">47</div>
+                <div className="text-xs text-muted-foreground">Searches</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-blue-600">23</div>
+                <div className="text-xs text-muted-foreground">Reports</div>
+              </div>
+            </div>
+            <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+              <div className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">Network Security Testing</div>
+              <div className="flex items-center justify-between text-xs text-blue-600">
+                <span>25 minutes remaining</span>
+                <span>45% complete</span>
+              </div>
+              <Progress value={45} className="h-2 mt-2" />
+            </div>
           </CardContent>
         </Card>
       </div>
