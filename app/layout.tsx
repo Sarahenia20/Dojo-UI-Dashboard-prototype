@@ -1,20 +1,13 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter, Geist_Mono } from "next/font/google"
+import { GeistSans } from "geist/font/sans"
+import { GeistMono } from "geist/font/mono"
 import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-})
+const geistSans = GeistSans
 
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-geist-mono",
-})
+const geistMono = GeistMono
 
 export const metadata: Metadata = {
   title: "The SamurAI DOJO",
@@ -28,12 +21,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${geistMono.variable} antialiased`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
       <head>
         <style>{`
 html {
-  font-family: ${inter.style.fontFamily};
-  --font-sans: ${inter.variable};
+  font-family: ${geistSans.style.fontFamily};
+  --font-sans: ${geistSans.variable};
   --font-mono: ${geistMono.variable};
 }
         `}</style>
