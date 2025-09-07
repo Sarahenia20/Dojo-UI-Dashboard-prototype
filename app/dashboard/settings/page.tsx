@@ -22,216 +22,27 @@ import {
   Save,
   Sparkles,
   Database,
-  Cloud,
-  Zap,
-  Check,
   Settings,
-  Network,
-  Users,
-  FileText,
-  Briefcase,
-  MessageSquare,
-  BarChart3,
-  Workflow,
-  Server,
-  Brain,
-  Target,
-  Layers,
-  AlertTriangle,
-  CheckCircle,
 } from "lucide-react"
 
 export default function ProfileSettingsPage() {
   const [isEditing, setIsEditing] = useState(false)
   const [showApiKey, setShowApiKey] = useState(false)
 
-  const [securityFocus, setSecurityFocus] = useState(["endpoint", "data", "compliance", "identity"])
-  const [utilityFocus, setUtilityFocus] = useState(["productivity", "analytics", "collaboration"])
-
-  const securityFocusOptions = [
-    {
-      id: "endpoint",
-      label: "Endpoint Protection",
-      icon: Shield,
-      description: "Antivirus, EDR, device management",
-      category: "Infrastructure",
-    },
-    {
-      id: "network",
-      label: "Network Security",
-      icon: Network,
-      description: "Firewalls, IDS/IPS, network monitoring",
-      category: "Infrastructure",
-    },
-    {
-      id: "data",
-      label: "Data Protection",
-      icon: Database,
-      description: "Encryption, DLP, backup solutions",
-      category: "Data Security",
-    },
-    {
-      id: "cloud",
-      label: "Cloud Security",
-      icon: Cloud,
-      description: "CASB, cloud workload protection",
-      category: "Infrastructure",
-    },
-    {
-      id: "identity",
-      label: "Identity & Access",
-      icon: User,
-      description: "IAM, SSO, privileged access management",
-      category: "Access Control",
-    },
-    {
-      id: "compliance",
-      label: "Compliance Management",
-      icon: FileText,
-      description: "GRC, audit trails, policy management",
-      category: "Governance",
-    },
-    {
-      id: "threat",
-      label: "Threat Intelligence",
-      icon: Brain,
-      description: "SIEM, threat hunting, incident response",
-      category: "Detection",
-    },
-    {
-      id: "vulnerability",
-      label: "Vulnerability Management",
-      icon: AlertTriangle,
-      description: "Scanning, assessment, patch management",
-      category: "Risk Management",
-    },
-    {
-      id: "application",
-      label: "Application Security",
-      icon: Layers,
-      description: "SAST, DAST, code analysis",
-      category: "Development",
-    },
-    {
-      id: "incident",
-      label: "Incident Response",
-      icon: Target,
-      description: "SOAR, forensics, crisis management",
-      category: "Operations",
-    },
-  ]
-
-  const utilityFocusOptions = [
-    {
-      id: "productivity",
-      label: "Productivity Suites",
-      icon: Zap,
-      description: "Office tools, document management",
-      category: "Workplace",
-    },
-    {
-      id: "communication",
-      label: "Communication Platforms",
-      icon: MessageSquare,
-      description: "Chat, video conferencing, messaging",
-      category: "Collaboration",
-    },
-    {
-      id: "analytics",
-      label: "Business Intelligence",
-      icon: BarChart3,
-      description: "Data visualization, reporting, dashboards",
-      category: "Analytics",
-    },
-    {
-      id: "automation",
-      label: "Process Automation",
-      icon: Workflow,
-      description: "RPA, workflow engines, integration",
-      category: "Operations",
-    },
-    {
-      id: "collaboration",
-      label: "Team Collaboration",
-      icon: Users,
-      description: "Project management, file sharing",
-      category: "Collaboration",
-    },
-    {
-      id: "infrastructure",
-      label: "IT Infrastructure",
-      icon: Server,
-      description: "Monitoring, deployment, DevOps tools",
-      category: "Operations",
-    },
-    {
-      id: "crm",
-      label: "Customer Management",
-      icon: Briefcase,
-      description: "CRM, sales automation, support tools",
-      category: "Business",
-    },
-    {
-      id: "finance",
-      label: "Financial Management",
-      icon: Database,
-      description: "ERP, accounting, expense management",
-      category: "Business",
-    },
-    {
-      id: "hr",
-      label: "Human Resources",
-      icon: Users,
-      description: "HRIS, recruitment, performance management",
-      category: "Business",
-    },
-    {
-      id: "marketing",
-      label: "Marketing Automation",
-      icon: Target,
-      description: "Email marketing, social media, campaigns",
-      category: "Business",
-    },
-  ]
-
-  const handleFocusChange = (type, focusId) => {
-    if (type === "security") {
-      setSecurityFocus((prev) => (prev.includes(focusId) ? prev.filter((id) => id !== focusId) : [...prev, focusId]))
-    } else {
-      setUtilityFocus((prev) => (prev.includes(focusId) ? prev.filter((id) => id !== focusId) : [...prev, focusId]))
-    }
-  }
-
-  const groupedSecurityOptions = securityFocusOptions.reduce((acc, option) => {
-    if (!acc[option.category]) acc[option.category] = []
-    acc[option.category].push(option)
-    return acc
-  }, {})
-
-  const groupedUtilityOptions = utilityFocusOptions.reduce((acc, option) => {
-    if (!acc[option.category]) acc[option.category] = []
-    acc[option.category].push(option)
-    return acc
-  }, {})
-
   return (
     <div className="space-y-6">
       <div className="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-xl p-6 text-white">
         <div>
           <h1 className="text-2xl font-bold">Profile Settings</h1>
-          <p className="text-cyan-100 mt-1">Manage your professional platform profile and preferences</p>
+          <p className="text-white mt-1">Manage your professional platform profile and preferences</p>
         </div>
       </div>
 
       <Tabs defaultValue="identity" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-slate-900 border-slate-800">
+        <TabsList className="grid w-full grid-cols-3 bg-slate-900 border-slate-800">
           <TabsTrigger value="identity" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">
             <User className="h-4 w-4 mr-2" />
             Professional Identity
-          </TabsTrigger>
-          <TabsTrigger value="focus" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">
-            <Shield className="h-4 w-4 mr-2" />
-            Focus Areas
           </TabsTrigger>
           <TabsTrigger value="notifications" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">
             <Bell className="h-4 w-4 mr-2" />
@@ -323,6 +134,48 @@ export default function ProfileSettingsPage() {
                     </div>
                     <p className="text-slate-400 text-xs mt-1">Verified via smart detection</p>
                   </div>
+
+                  <div>
+                    <Label className="text-slate-400 text-sm font-medium">Experience Level</Label>
+                    <select
+                      className="w-full p-2 bg-slate-800 border border-slate-600 rounded text-white mt-2"
+                      defaultValue="5-10"
+                    >
+                      <option value="1-3">1-3 years</option>
+                      <option value="3-5">3-5 years</option>
+                      <option value="5-10">5-10 years</option>
+                      <option value="10+">10+ years</option>
+                    </select>
+                    <p className="text-slate-400 text-xs mt-1">Years of experience in current role</p>
+                  </div>
+
+                  <div>
+                    <Label className="text-slate-400 text-sm font-medium">Decision Authority</Label>
+                    <select
+                      className="w-full p-2 bg-slate-800 border border-slate-600 rounded text-white mt-2"
+                      defaultValue="manager"
+                    >
+                      <option value="individual">Individual Contributor</option>
+                      <option value="team-lead">Team Lead</option>
+                      <option value="manager">Manager</option>
+                      <option value="director">Director</option>
+                      <option value="executive">Executive</option>
+                    </select>
+                    <p className="text-slate-400 text-xs mt-1">Role in technology decision making</p>
+                  </div>
+
+                  <div>
+                    <Label className="text-slate-400 text-sm font-medium">Professional Certifications</Label>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <Badge className="bg-blue-500/20 text-blue-400">CISSP</Badge>
+                      <Badge className="bg-green-500/20 text-green-400">CISA</Badge>
+                      <Badge className="bg-purple-500/20 text-purple-400">HIPAA</Badge>
+                      <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white text-xs">
+                        + Add Certification
+                      </Button>
+                    </div>
+                    <p className="text-slate-400 text-xs mt-1">Professional certifications and qualifications</p>
+                  </div>
                 </div>
 
                 {isEditing && (
@@ -395,118 +248,6 @@ export default function ProfileSettingsPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="focus" className="space-y-6">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            {/* Protection & Verification Focus */}
-            <Card className="bg-slate-900 border-slate-800 text-white">
-              <CardHeader>
-                <div className="flex items-center space-x-2">
-                  <Shield className="h-5 w-5 text-cyan-400" />
-                  <CardTitle className="text-lg">Protection & Verification Focus</CardTitle>
-                </div>
-                <p className="text-slate-400 text-sm">Select your security and protection focus areas</p>
-                <div className="flex items-center space-x-2 mt-2">
-                  <CheckCircle className="h-4 w-4 text-green-400" />
-                  <span className="text-green-400 text-sm font-medium">{securityFocus.length} areas selected</span>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {Object.entries(groupedSecurityOptions).map(([category, options]) => (
-                    <div key={category}>
-                      <h4 className="text-slate-300 font-medium text-sm mb-3 uppercase tracking-wide">{category}</h4>
-                      <div className="grid grid-cols-1 gap-3">
-                        {options.map((option) => {
-                          const Icon = option.icon
-                          const isSelected = securityFocus.includes(option.id)
-                          return (
-                            <button
-                              key={option.id}
-                              onClick={() => handleFocusChange("security", option.id)}
-                              className={`flex items-start p-4 rounded-lg border transition-all text-left ${
-                                isSelected
-                                  ? "border-cyan-500 bg-cyan-500/10"
-                                  : "border-slate-600 bg-slate-800 hover:border-slate-500"
-                              }`}
-                            >
-                              <Icon
-                                className={`w-5 h-5 mr-3 mt-0.5 flex-shrink-0 ${isSelected ? "text-cyan-400" : "text-slate-400"}`}
-                              />
-                              <div className="flex-1">
-                                <span
-                                  className={`font-medium block ${isSelected ? "text-cyan-300" : "text-slate-300"}`}
-                                >
-                                  {option.label}
-                                </span>
-                                <span className="text-slate-400 text-xs mt-1 block">{option.description}</span>
-                              </div>
-                              {isSelected && <Check className="w-4 h-4 ml-2 text-cyan-400 flex-shrink-0" />}
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Business Utility Focus */}
-            <Card className="bg-slate-900 border-slate-800 text-white">
-              <CardHeader>
-                <div className="flex items-center space-x-2">
-                  <Zap className="h-5 w-5 text-teal-400" />
-                  <CardTitle className="text-lg">Business Utility Focus</CardTitle>
-                </div>
-                <p className="text-slate-400 text-sm">Select your business and productivity focus areas</p>
-                <div className="flex items-center space-x-2 mt-2">
-                  <CheckCircle className="h-4 w-4 text-green-400" />
-                  <span className="text-green-400 text-sm font-medium">{utilityFocus.length} areas selected</span>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {Object.entries(groupedUtilityOptions).map(([category, options]) => (
-                    <div key={category}>
-                      <h4 className="text-slate-300 font-medium text-sm mb-3 uppercase tracking-wide">{category}</h4>
-                      <div className="grid grid-cols-1 gap-3">
-                        {options.map((option) => {
-                          const Icon = option.icon
-                          const isSelected = utilityFocus.includes(option.id)
-                          return (
-                            <button
-                              key={option.id}
-                              onClick={() => handleFocusChange("utility", option.id)}
-                              className={`flex items-start p-4 rounded-lg border transition-all text-left ${
-                                isSelected
-                                  ? "border-teal-500 bg-teal-500/10"
-                                  : "border-slate-600 bg-slate-800 hover:border-slate-500"
-                              }`}
-                            >
-                              <Icon
-                                className={`w-5 h-5 mr-3 mt-0.5 flex-shrink-0 ${isSelected ? "text-teal-400" : "text-slate-400"}`}
-                              />
-                              <div className="flex-1">
-                                <span
-                                  className={`font-medium block ${isSelected ? "text-teal-300" : "text-slate-300"}`}
-                                >
-                                  {option.label}
-                                </span>
-                                <span className="text-slate-400 text-xs mt-1 block">{option.description}</span>
-                              </div>
-                              {isSelected && <Check className="w-4 h-4 ml-2 text-teal-400 flex-shrink-0" />}
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
         {/* Notifications Tab */}
         <TabsContent value="notifications" className="space-y-6">
           <Card className="bg-slate-900 border-slate-800 text-white">
@@ -546,6 +287,30 @@ export default function ProfileSettingsPage() {
                     <p className="text-slate-400 text-sm">Lab completion and results</p>
                   </div>
                   <Switch defaultChecked />
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-slate-800 rounded-lg">
+                  <div>
+                    <p className="text-white font-medium">Security Threat Alerts</p>
+                    <p className="text-slate-400 text-sm">Industry-specific security threats and advisories</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-slate-800 rounded-lg">
+                  <div>
+                    <p className="text-white font-medium">Compliance Deadlines</p>
+                    <p className="text-slate-400 text-sm">Regulatory requirement reminders and updates</p>
+                  </div>
+                  <Switch />
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-slate-800 rounded-lg">
+                  <div>
+                    <p className="text-white font-medium">Training Opportunities</p>
+                    <p className="text-slate-400 text-sm">Certification and professional development</p>
+                  </div>
+                  <Switch />
                 </div>
               </div>
             </CardContent>
@@ -677,6 +442,65 @@ export default function ProfileSettingsPage() {
                           <span className="text-white font-medium">Compliance Monitoring</span>
                         </div>
                         <Badge className="bg-green-500/20 text-green-400">Active</Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-slate-400 text-sm font-medium">SSO Configuration</Label>
+                    <div className="mt-3 space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-slate-800 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
+                            <Shield className="h-4 w-4 text-white" />
+                          </div>
+                          <div>
+                            <span className="text-white font-medium">SAML 2.0</span>
+                            <p className="text-slate-400 text-xs">mercy-general.okta.com</p>
+                          </div>
+                        </div>
+                        <Badge className="bg-green-500/20 text-green-400">Connected</Badge>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-slate-600 text-slate-300 hover:bg-slate-800 bg-transparent"
+                      >
+                        Configure SSO
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-slate-400 text-sm font-medium">API Usage & Monitoring</Label>
+                    <div className="mt-3 space-y-3">
+                      <div className="p-3 bg-slate-800 rounded-lg">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-white text-sm">Monthly API Calls</span>
+                          <span className="text-cyan-400 font-medium">2,847 / 10,000</span>
+                        </div>
+                        <div className="w-full bg-slate-700 rounded-full h-2">
+                          <div
+                            className="bg-gradient-to-r from-cyan-500 to-teal-500 h-2 rounded-full"
+                            style={{ width: "28%" }}
+                          ></div>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-slate-600 text-slate-300 hover:bg-slate-800 bg-transparent"
+                        >
+                          View Usage Details
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-slate-600 text-slate-300 hover:bg-slate-800 bg-transparent"
+                        >
+                          Audit Logs
+                        </Button>
                       </div>
                     </div>
                   </div>

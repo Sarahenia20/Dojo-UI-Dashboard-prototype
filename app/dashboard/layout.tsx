@@ -98,9 +98,7 @@ export default function DashboardLayout({
               </div>
               <div>
                 <span className="text-lg font-bold text-foreground">The SamurAI</span>
-                <span className="text-lg font-bold bg-gradient-to-r from-cyan-500 to-teal-500 bg-clip-text text-transparent ml-1">
-                  DOJO
-                </span>
+                <span className="text-lg font-bold text-cyan-600 dark:text-cyan-400 ml-1">DOJO</span>
               </div>
             </div>
           )}
@@ -204,7 +202,7 @@ export default function DashboardLayout({
             </div>
 
             <div className="text-center py-2 border-t border-border/50">
-              <p className="text-xs text-muted-foreground">© 2025 SamurAI DOJO Inc.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">© 2025 SamurAI DOJO Inc.</p>
             </div>
           </div>
         )}
@@ -257,7 +255,7 @@ export default function DashboardLayout({
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-white">Erika</p>
-                      <p className="text-sm text-cyan-100 truncate">Healthcare Security Analyst</p>
+                      <p className="text-sm text-white truncate">Healthcare Security Analyst</p>
                       <p className="text-xs text-cyan-200 truncate">erika@mercygeneral.com</p>
                     </div>
                   </div>

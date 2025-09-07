@@ -12,26 +12,26 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold mb-1">Welcome, Erika</h1>
-              <p className="text-cyan-100 text-sm mb-4">Last active: 2 hours ago</p>
+              <p className="text-white text-sm mb-4">Last active: 2 hours ago</p>
               <div className="flex items-center space-x-2 text-sm">
-                <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                <Badge variant="secondary" className="bg-white text-slate-800 border-white">
                   <CheckCircle className="w-3 h-3 mr-1" />
                   Business Evaluation - 75% Complete
                 </Badge>
-                <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                <Badge variant="secondary" className="bg-white text-slate-800 border-white">
                   <Clock className="w-3 h-3 mr-1" />
                   Productivity Review pending
                 </Badge>
               </div>
             </div>
             <div className="flex space-x-3">
-              <Button variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-white/30">
+              <Button variant="secondary" className="bg-white hover:bg-gray-100 text-slate-800 border-white">
                 New Search
               </Button>
-              <Button variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-white/30">
+              <Button variant="secondary" className="bg-white hover:bg-gray-100 text-slate-800 border-white">
                 View Reports
               </Button>
-              <Button variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-white/30">
+              <Button variant="secondary" className="bg-white hover:bg-gray-100 text-slate-800 border-white">
                 Resume Project
               </Button>
             </div>
@@ -71,7 +71,7 @@ export default function DashboardPage() {
             <div className="space-y-4">
               <div className="p-4 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg text-white">
                 <div className="text-2xl font-bold">+23%</div>
-                <div className="text-sm text-cyan-100">Improvement potential</div>
+                <div className="text-sm text-white">Improvement potential</div>
               </div>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
