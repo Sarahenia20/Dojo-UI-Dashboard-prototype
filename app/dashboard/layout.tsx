@@ -239,14 +239,14 @@ export default function DashboardLayout({
                   className="relative h-10 w-10 rounded-full ring-2 ring-transparent hover:ring-cyan-500/20 transition-all"
                 >
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src="/professional-avatar.png" />
+                    <AvatarImage src="/professional-avatar.png" alt="Profile" />
                     <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white font-semibold">
                       E
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-72 p-0" align="end" forceMount>
+              <DropdownMenuContent className="w-72 p-0 z-[100]" align="end" forceMount sideOffset={8}>
                 <div className="bg-gradient-to-r from-cyan-500 to-teal-500 p-4 text-white">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-12 w-12 ring-2 ring-white/20">
