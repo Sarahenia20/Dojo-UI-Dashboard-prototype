@@ -79,16 +79,16 @@ export default function SamuraiLabsPage() {
   const [deploymentProgress, setDeploymentProgress] = useState(0)
   const [deploymentStep, setDeploymentStep] = useState("")
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
+  const [showEmailAlerts, setShowEmailAlerts] = useState(false)
 
   useEffect(() => {
     const action = searchParams.get("action")
     const products = searchParams.get("products")
 
-    if (action === "deploy" && products && labState === "none") {
-      const productIds = products.split(",").map((id) => Number.parseInt(id))
-      setLabState("email-sent")
+    if (action === "deploy" && products && !showEmailAlerts) {
+      setShowEmailAlerts(true)
     }
-  }, [searchParams, labState])
+  }, [searchParams, showEmailAlerts])
 
   const simulateDeployment = (productIds: number[] = [1, 2, 3]) => {
     setLabState("deploying")
@@ -213,6 +213,7 @@ export default function SamuraiLabsPage() {
 
   const handleUseDemoKey = () => {
     setPemKey("-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA7vbqajDhA...\n-----END RSA PRIVATE KEY-----")
+    setLabState("connected")
   }
 
   const handleConfigureAttack = () => {
@@ -617,60 +618,98 @@ export default function SamuraiLabsPage() {
                 <TabsContent value="active" className="space-y-6">
                   <Card>
                     <CardContent className="p-0">
-                      {/* State 1: Pre-Connection - PEM Authentication Interface */}
-                      {labState === "none" && (
-                        <div className="p-6 space-y-6">
-                          {/* Top Section: Status & Context */}
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center space-x-3">
-                                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                                <span className="font-semibold text-lg">Lab Environment Ready</span>
+                      <div className="space-y-0">
+                        {/* Email Alerts Section - Show when coming from product search */}
+                        {showEmailAlerts && (
+                          <div className="p-4 space-y-3 bg-blue-50 dark:bg-blue-950/20 border-b">
+                            <div className="bg-blue-100 dark:bg-blue-900/30 p-4 rounded-lg border border-blue-200">
+                              <div className="flex items-center justify-center space-x-2 mb-3">
+                                <Mail className="h-5 w-5 text-blue-600" />
+                                <span className="font-medium">Email Notification</span>
                               </div>
-                              <Badge className="bg-green-100 text-green-800 border-green-300">
-                                Infrastructure Active
-                              </Badge>
-                            </div>
-
-                            {/* Selected Products Display */}
-                            <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg border border-blue-200">
-                              <h4 className="font-medium mb-3 flex items-center">
-                                <Shield className="h-4 w-4 mr-2 text-blue-600" />
-                                Security Tools Deployed
-                              </h4>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                {selectedProductsForLab.map((product) => (
-                                  <div
-                                    key={product.id}
-                                    className="flex items-center space-x-3 p-3 bg-white dark:bg-card rounded border"
-                                  >
-                                    {product.logo && (
-                                      <img
-                                        src={product.logo || "/placeholder.svg"}
-                                        alt={product.vendor}
-                                        className="w-6 h-6 object-contain"
-                                      />
-                                    )}
-                                    <div className="flex-1 min-w-0">
-                                      <p className="font-medium text-sm truncate">{product.name}</p>
-                                      <p className="text-xs text-muted-foreground truncate">{product.category}</p>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Center Section: Connection Interface */}
-                          <div className="space-y-6">
-                            <div className="text-center space-y-2">
-                              <h3 className="text-xl font-semibold">Connect to Your Lab</h3>
-                              <p className="text-muted-foreground">
-                                Paste your SSH private key to access your lab environment
+                              <p className="text-sm text-muted-foreground text-center">
+                                You will receive an email with SSH keys, PAM credentials, and setup instructions within
+                                the next 2-3 minutes.
                               </p>
                             </div>
 
-                            {labState === "none" && (
+                            <div className="bg-yellow-100 dark:bg-yellow-900/30 p-4 rounded-lg border border-yellow-200">
+                              <div className="flex items-center justify-center space-x-2 mb-2">
+                                <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                                <span className="font-medium text-yellow-800 dark:text-yellow-200">Important</span>
+                              </div>
+                              <p className="text-sm text-yellow-700 dark:text-yellow-300 text-center">
+                                Please do not refresh this browser to prevent any data loss. You can use the demo key
+                                below for immediate testing.
+                              </p>
+                            </div>
+
+                            <div className="flex justify-center">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShowEmailAlerts(false)}
+                                className="text-muted-foreground hover:text-foreground"
+                              >
+                                Dismiss Alerts
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Lab Environment Ready - Always Available */}
+                        {labState !== "connected" && (
+                          <div className="p-6 space-y-6">
+                            {/* Top Section: Status & Context */}
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                                  <span className="font-semibold text-lg">Lab Environment Ready</span>
+                                </div>
+                                <Badge className="bg-green-100 text-green-800 border-green-300">
+                                  Infrastructure Active
+                                </Badge>
+                              </div>
+
+                              {/* Security Tools Deployed */}
+                              <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg border border-blue-200">
+                                <h4 className="font-medium mb-3 flex items-center">
+                                  <Shield className="h-4 w-4 mr-2 text-blue-600" />
+                                  Security Tools Deployed
+                                </h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                  {selectedProductsForLab.map((product) => (
+                                    <div
+                                      key={product.id}
+                                      className="flex items-center space-x-3 p-3 bg-white dark:bg-card rounded border"
+                                    >
+                                      {product.logo && (
+                                        <img
+                                          src={product.logo || "/placeholder.svg"}
+                                          alt={product.vendor}
+                                          className="w-6 h-6 object-contain"
+                                        />
+                                      )}
+                                      <div className="flex-1 min-w-0">
+                                        <p className="font-medium text-sm truncate">{product.name}</p>
+                                        <p className="text-xs text-muted-foreground truncate">{product.category}</p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Center Section: Connection Interface */}
+                            <div className="space-y-6">
+                              <div className="text-center space-y-2">
+                                <h3 className="text-xl font-semibold">Connect to Your Lab</h3>
+                                <p className="text-muted-foreground">
+                                  Paste your SSH private key to access your lab environment
+                                </p>
+                              </div>
+
                               <div className="space-y-4">
                                 {/* Large PEM Key Input Area */}
                                 <div className="space-y-2">
@@ -678,10 +717,7 @@ export default function SamuraiLabsPage() {
                                   <textarea
                                     value={pemKey}
                                     onChange={(e) => setPemKey(e.target.value)}
-                                    placeholder="-----BEGIN RSA PRIVATE KEY-----
-MIIEpAIBAAKCAQEA7vbqajDhA...
-...
------END RSA PRIVATE KEY-----"
+                                    placeholder="-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA7vbqajDhA...\n...\n-----END RSA PRIVATE KEY-----"
                                     className="w-full h-32 p-4 border rounded-lg text-sm font-mono resize-none bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                   />
                                 </div>
@@ -715,200 +751,97 @@ MIIEpAIBAAKCAQEA7vbqajDhA...
                                   </Button>
                                 </div>
 
-                                {/* Demo Key Option */}
-                                <div className="text-center">
-                                  <Button variant="ghost" size="sm" onClick={handleUseDemoKey}>
+                                <div className="text-center space-y-2">
+                                  <div className="relative">
+                                    <div className="absolute inset-0 flex items-center">
+                                      <div className="w-full border-t border-gray-300" />
+                                    </div>
+                                    <div className="relative flex justify-center text-sm">
+                                      <span className="px-2 bg-background text-muted-foreground">for testing</span>
+                                    </div>
+                                  </div>
+                                  <Button
+                                    variant="outline"
+                                    size="lg"
+                                    onClick={handleUseDemoKey}
+                                    className="bg-green-50 hover:bg-green-100 border-green-300 text-green-700 hover:text-green-800"
+                                  >
+                                    <Star className="h-4 w-4 mr-2" />
                                     Use Demo Key for Testing
+                                  </Button>
+                                  <p className="text-xs text-muted-foreground">
+                                    Instantly access terminal and desktop with demo credentials
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Connected State - Terminal/Desktop Access */}
+                        {labState === "connected" && (
+                          <div className="space-y-0">
+                            {/* Enhanced Header with View Toggle */}
+                            <div className="flex items-center justify-between p-4 border-b bg-slate-50 dark:bg-slate-900/20">
+                              <div className="flex items-center space-x-4">
+                                <div className="flex items-center space-x-3">
+                                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                  <span className="font-medium">Connected to Lab</span>
+                                  <Badge variant="outline" className="text-xs">
+                                    ubuntu@lab-instance:~$
+                                  </Badge>
+                                </div>
+
+                                <div className="flex items-center space-x-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+                                  <Button
+                                    variant={viewMode === "terminal" ? "default" : "ghost"}
+                                    size="sm"
+                                    onClick={() => setViewMode("terminal")}
+                                    className="px-3 py-1 text-xs h-8"
+                                  >
+                                    <Terminal className="h-3 w-3 mr-1" />
+                                    Terminal View
+                                  </Button>
+                                  <Button
+                                    variant={viewMode === "desktop" ? "default" : "ghost"}
+                                    size="sm"
+                                    onClick={() => setViewMode("desktop")}
+                                    className="px-3 py-1 text-xs h-8"
+                                  >
+                                    <Monitor className="h-3 w-3 mr-1" />
+                                    Desktop View
                                   </Button>
                                 </div>
                               </div>
-                            )}
 
-                            {/* State 2: During Connection - Loading Interface */}
-                            {labState === "deploying" && (
-                              <div className="space-y-6 text-center">
-                                <div className="flex justify-center">
-                                  <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-                                </div>
-                                <div className="space-y-2">
-                                  <h3 className="text-xl font-semibold">Establishing Secure Connection</h3>
-                                  <p className="text-muted-foreground">{deploymentStep}</p>
-                                </div>
-                                <div className="space-y-2">
-                                  <div className="w-full bg-gray-200 rounded-full h-2">
-                                    <div
-                                      className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                                      style={{ width: `${deploymentProgress}%` }}
-                                    ></div>
-                                  </div>
-                                  <p className="text-sm text-muted-foreground">{deploymentProgress}% Complete</p>
-                                </div>
-                                <Button variant="outline" onClick={() => setLabState("none")}>
-                                  Cancel Connection
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* State 3: Post-Connection - Active Terminal/Desktop State */}
-                      {labState === "connected" && (
-                        <div className="space-y-0">
-                          {/* Enhanced Header with View Toggle */}
-                          <div className="flex items-center justify-between p-4 border-b bg-slate-50 dark:bg-slate-900/20">
-                            <div className="flex items-center space-x-4">
-                              <div className="flex items-center space-x-3">
-                                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                <span className="font-medium">Connected to Lab</span>
-                                <Badge variant="outline" className="text-xs">
-                                  ubuntu@lab-instance:~$
-                                </Badge>
-                              </div>
-
-                              <div className="flex items-center space-x-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-                                <Button
-                                  variant={viewMode === "terminal" ? "default" : "ghost"}
-                                  size="sm"
-                                  onClick={() => setViewMode("terminal")}
-                                  className="px-3 py-1 text-xs h-8"
-                                >
-                                  <Terminal className="h-3 w-3 mr-1" />
-                                  Terminal View
-                                </Button>
-                                <Button
-                                  variant={viewMode === "desktop" ? "default" : "ghost"}
-                                  size="sm"
-                                  onClick={() => setViewMode("desktop")}
-                                  className="px-3 py-1 text-xs h-8"
-                                >
-                                  <Monitor className="h-3 w-3 mr-1" />
-                                  Desktop View
+                              <div className="flex items-center space-x-4">
+                                <span className="text-sm text-muted-foreground">Session: 2h 45m remaining</span>
+                                <Button variant="outline" size="sm" onClick={handleStopLab}>
+                                  Disconnect
                                 </Button>
                               </div>
                             </div>
 
-                            <div className="flex items-center space-x-4">
-                              <span className="text-sm text-muted-foreground">Session: 2h 45m remaining</span>
-                              <Button variant="outline" size="sm" onClick={handleStopLab}>
-                                Disconnect
-                              </Button>
+                            {/* Dynamic Content Based on View Mode */}
+                            <div className="p-0">
+                              {viewMode === "terminal" ? (
+                                <WebTerminal
+                                  className="w-full min-h-[500px]"
+                                  labName="samurai-lab"
+                                  onCommand={handleTerminalCommand}
+                                />
+                              ) : (
+                                <VNCClient
+                                  className="w-full min-h-[500px]"
+                                  labName="samurai-lab"
+                                  onConnect={() => console.log("[v0] VNC connected")}
+                                  onDisconnect={() => console.log("[v0] VNC disconnected")}
+                                />
+                              )}
                             </div>
                           </div>
-
-                          {/* Dynamic Content Based on View Mode */}
-                          <div className="p-0">
-                            {viewMode === "terminal" ? (
-                              <WebTerminal
-                                className="w-full min-h-[500px]"
-                                labName="samurai-lab"
-                                onCommand={handleTerminalCommand}
-                              />
-                            ) : (
-                              <VNCClient
-                                className="w-full min-h-[500px]"
-                                labName="samurai-lab"
-                                onConnect={() => console.log("[v0] VNC connected")}
-                                onDisconnect={() => console.log("[v0] VNC disconnected")}
-                              />
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* State 2: Email Sent - Waiting for credentials */}
-                      {labState === "email-sent" && (
-                        <div className="space-y-6 text-center p-6">
-                          <div className="flex justify-center">
-                            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                              <Mail className="h-8 w-8 text-blue-600" />
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <h3 className="text-xl font-semibold">Lab Deployment in Progress</h3>
-                            <p className="text-muted-foreground">
-                              We are setting up your lab environment with the selected security tools.
-                            </p>
-                          </div>
-
-                          <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg border border-blue-200">
-                            <div className="flex items-center justify-center space-x-2 mb-3">
-                              <Mail className="h-5 w-5 text-blue-600" />
-                              <span className="font-medium">Email Notification</span>
-                            </div>
-                            <p className="text-sm text-muted-foreground">
-                              You will receive an email with SSH keys, PAM credentials, and setup instructions within
-                              the next 2-3 minutes.
-                            </p>
-                          </div>
-
-                          <div className="bg-yellow-50 dark:bg-yellow-950/20 p-4 rounded-lg border border-yellow-200">
-                            <div className="flex items-center justify-center space-x-2 mb-2">
-                              <AlertTriangle className="h-5 w-5 text-yellow-600" />
-                              <span className="font-medium text-yellow-800 dark:text-yellow-200">Important</span>
-                            </div>
-                            <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                              Please do not refresh this browser to prevent any data loss. Once you receive the email
-                              and upload your credentials, your lab will be ready.
-                            </p>
-                          </div>
-
-                          {/* Security Tools Deployed section */}
-                          <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg border border-blue-200">
-                            <h4 className="font-medium mb-3 flex items-center justify-center">
-                              <Shield className="h-4 w-4 mr-2 text-blue-600" />
-                              Security Tools Deployed
-                            </h4>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                              {selectedProductsForLab.map((product) => (
-                                <div
-                                  key={product.id}
-                                  className="flex items-center space-x-3 p-3 bg-white dark:bg-card rounded border"
-                                >
-                                  {product.logo && (
-                                    <img
-                                      src={product.logo || "/placeholder.svg"}
-                                      alt={product.vendor}
-                                      className="w-6 h-6 object-contain"
-                                    />
-                                  )}
-                                  <div className="flex-1 min-w-0">
-                                    <p className="font-medium text-sm truncate">{product.name}</p>
-                                    <p className="text-xs text-muted-foreground truncate">{product.category}</p>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div className="space-y-4">
-                            <div className="space-y-2">
-                              <label className="block text-sm font-medium">
-                                When you receive the email, paste your SSH private key here:
-                              </label>
-                              <textarea
-                                value={pemKey}
-                                onChange={(e) => setPemKey(e.target.value)}
-                                placeholder="-----BEGIN RSA PRIVATE KEY-----
-MIIEpAIBAAKCAQEA7vbqajDhA...
-...
------END RSA PRIVATE KEY-----"
-                                className="w-full h-32 p-4 border rounded-lg text-sm font-mono resize-none bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              />
-                            </div>
-
-                            <Button
-                              onClick={handleConnectLab}
-                              disabled={!pemKey.trim()}
-                              className="bg-blue-600 hover:bg-blue-700 px-8 py-3"
-                              size="lg"
-                            >
-                              <Terminal className="h-5 w-5 mr-2" />
-                              Connect to Lab
-                            </Button>
-                          </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
                 </TabsContent>
