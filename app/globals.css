@@ -146,3 +146,15 @@
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
+
+/* Adding high-specificity class to force button contrast */
+.resume-project-button.resume-project-button.resume-project-button {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.resume-project-button.resume-project-button.resume-project-button:hover {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+}

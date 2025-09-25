@@ -31,7 +31,6 @@ import {
   Bug,
   LogOut,
   Users,
-  Trash2,
   ChevronLeft,
   ChevronRight,
   Menu,
@@ -39,7 +38,7 @@ import {
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Product Search", href: "/dashboard/product-search", icon: Search },
+  { name: "Product Catalog", href: "/dashboard/product-search", icon: Search },
   { name: "Samurai Labs", href: "/dashboard/labs", icon: Zap },
   { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
   { name: "Workspaces", href: "/dashboard/workspaces", icon: Users },
@@ -60,15 +59,6 @@ export default function DashboardLayout({
     { name: "Erika Workspace", type: "Personal", icon: User, color: "cyan" },
     { name: "TechCorp Security", type: "Team", icon: Users, color: "blue" },
   ]
-
-  const handleLeaveWorkspace = (workspaceName: string) => {
-    if (workspaceName !== "Erika Workspace") {
-      console.log(`Leaving workspace: ${workspaceName}`)
-      if (currentWorkspace === workspaceName) {
-        setCurrentWorkspace("Erika Workspace")
-      }
-    }
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -178,21 +168,8 @@ export default function DashboardLayout({
                           <p className="text-sm font-medium truncate">{workspace.name}</p>
                           <p className="text-xs text-muted-foreground truncate">{workspace.type}</p>
                         </div>
-                        <div className="flex items-center space-x-1">
+                        <div className="flex items-center">
                           {currentWorkspace === workspace.name && <CheckCircle className="w-4 h-4 text-cyan-500" />}
-                          {workspace.type === "Team" && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-6 w-6 p-0 hover:bg-red-100 dark:hover:bg-red-900/50"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleLeaveWorkspace(workspace.name)
-                              }}
-                            >
-                              <Trash2 className="w-3 h-3 text-red-500" />
-                            </Button>
-                          )}
                         </div>
                       </div>
                     </DropdownMenuItem>

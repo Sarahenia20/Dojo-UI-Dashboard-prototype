@@ -25,13 +25,22 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="flex space-x-3">
-              <Button variant="secondary" className="bg-white hover:bg-gray-100 text-slate-800 border-white">
+              <Button
+                variant="secondary"
+                className="bg-white hover:bg-gray-50 text-gray-900 border-white shadow-sm font-medium"
+              >
                 New Search
               </Button>
-              <Button variant="secondary" className="bg-white hover:bg-gray-100 text-slate-800 border-white">
+              <Button
+                variant="secondary"
+                className="bg-white hover:bg-gray-50 text-gray-900 border-white shadow-sm font-medium"
+              >
                 View Reports
               </Button>
-              <Button variant="secondary" className="bg-white hover:bg-gray-100 text-slate-800 border-white">
+              <Button
+                variant="secondary"
+                className="bg-white hover:bg-gray-50 text-gray-900 border-white shadow-sm font-medium"
+              >
                 Resume Project
               </Button>
             </div>

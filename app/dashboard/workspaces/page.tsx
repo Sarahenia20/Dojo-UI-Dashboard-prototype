@@ -1,17 +1,13 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
-import { Shield, Users, Plus, BarChart3, X, Sparkles, CheckCircle2, Edit, Settings } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Shield, Users, Plus, X, Sparkles, CheckCircle2, Edit, Settings, Database, Globe } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
@@ -21,840 +17,742 @@ interface InvitedMember {
   role: string
 }
 
+const focusAreas = [
+  // Security & Compliance Focus
+  {
+    id: "financial_protection",
+    name: "Financial Protection",
+    description: "Financial incident security validation",
+    category: "Security & Compliance Focus",
+  },
+  {
+    id: "network_security",
+    name: "Network Security",
+    description: "Firewall, IDS/IPS, and network monitoring",
+    category: "Security & Compliance Focus",
+  },
+  {
+    id: "identity_access",
+    name: "Identity & Access Management",
+    description: "SSO, MFA, and identity governance",
+    category: "Security & Compliance Focus",
+  },
+  {
+    id: "data_protection",
+    name: "Data Protection",
+    description: "DLP, encryption, and data governance",
+    category: "Security & Compliance Focus",
+  },
+  {
+    id: "cloud_security",
+    name: "Cloud Security",
+    description: "CSPM, CWPP, and multi-cloud security",
+    category: "Security & Compliance Focus",
+  },
+  {
+    id: "vulnerability_management",
+    name: "Vulnerability Management",
+    description: "Scanning, assessment, and remediation",
+    category: "Security & Compliance Focus",
+  },
+  {
+    id: "incident_response",
+    name: "Incident Response",
+    description: "SOAR, forensics, and incident management",
+    category: "Security & Compliance Focus",
+  },
+  {
+    id: "compliance_management",
+    name: "Compliance Management",
+    description: "GRC, audit, and regulatory compliance",
+    category: "Security & Compliance Focus",
+  },
+  {
+    id: "threat_intelligence",
+    name: "Threat Intelligence",
+    description: "Threat feeds, analysis, and hunting",
+    category: "Security & Compliance Focus",
+  },
+  {
+    id: "security_awareness",
+    name: "Security Awareness",
+    description: "Training, phishing simulation, and education",
+    category: "Security & Compliance Focus",
+  },
+  {
+    id: "application_security",
+    name: "Application Security",
+    description: "SAST, DAST, and application protection",
+    category: "Security & Compliance Focus",
+  },
+  {
+    id: "zero_trust",
+    name: "Zero Trust Architecture",
+    description: "Zero trust network and security frameworks",
+    category: "Security & Compliance Focus",
+  },
+
+  // Business & Operations Focus
+  {
+    id: "business_intelligence",
+    name: "Business Intelligence",
+    description: "Analytics, reporting, and data visualization",
+    category: "Business & Operations Focus",
+  },
+  {
+    id: "collaboration_tools",
+    name: "Collaboration Tools",
+    description: "Communication, file sharing, and teamwork",
+    category: "Business & Operations Focus",
+  },
+  {
+    id: "project_management",
+    name: "Project Management",
+    description: "Planning, tracking, and resource management",
+    category: "Business & Operations Focus",
+  },
+  {
+    id: "customer_relationship",
+    name: "Customer Relationship Management",
+    description: "CRM, sales, and customer service tools",
+    category: "Business & Operations Focus",
+  },
+  {
+    id: "enterprise_resource",
+    name: "Enterprise Resource Planning",
+    description: "ERP, finance, and business process tools",
+    category: "Business & Operations Focus",
+  },
+  {
+    id: "human_resources",
+    name: "Human Resources",
+    description: "HR management, payroll, and employee tools",
+    category: "Business & Operations Focus",
+  },
+  {
+    id: "marketing_automation",
+    name: "Marketing Automation",
+    description: "Email marketing, campaigns, and lead generation",
+    category: "Business & Operations Focus",
+  },
+  {
+    id: "document_management",
+    name: "Document Management",
+    description: "Document storage, workflow, and collaboration",
+    category: "Business & Operations Focus",
+  },
+  {
+    id: "backup_recovery",
+    name: "Backup & Recovery",
+    description: "Data backup, disaster recovery, and continuity",
+    category: "Business & Operations Focus",
+  },
+  {
+    id: "monitoring_observability",
+    name: "Monitoring & Observability",
+    description: "System monitoring, logging, and performance",
+    category: "Business & Operations Focus",
+  },
+  {
+    id: "automation_orchestration",
+    name: "Automation & Orchestration",
+    description: "Workflow automation and process optimization",
+    category: "Business & Operations Focus",
+  },
+  {
+    id: "integration_platforms",
+    name: "Integration Platforms",
+    description: "API management, data integration, and connectivity",
+    category: "Business & Operations Focus",
+  },
+]
+
+const complianceStandards = [
+  {
+    id: "hipaa",
+    name: "HIPAA",
+    description: "Healthcare data protection and privacy",
+    industries: ["Healthcare"],
+    countries: ["USA"],
+  },
+  {
+    id: "pci_dss",
+    name: "PCI DSS",
+    description: "Payment card industry data security",
+    industries: ["Financial Services", "Retail", "*"],
+    countries: ["*"],
+  },
+  {
+    id: "sox",
+    name: "SOX",
+    description: "Sarbanes-Oxley financial reporting",
+    industries: ["Financial Services", "*"],
+    countries: ["USA"],
+  },
+  { id: "gdpr", name: "GDPR", description: "European data protection regulation", industries: ["*"], regions: ["EU"] },
+  {
+    id: "ccpa",
+    name: "CCPA",
+    description: "California consumer privacy act",
+    industries: ["Technology", "Retail", "*"],
+    countries: ["USA"],
+  },
+  {
+    id: "nist_cybersecurity",
+    name: "NIST Cybersecurity Framework",
+    description: "National cybersecurity standards",
+    industries: ["*"],
+    countries: ["USA", "*"],
+  },
+  {
+    id: "fisma",
+    name: "FISMA",
+    description: "Federal information security management",
+    industries: ["Government", "*"],
+    countries: ["USA"],
+  },
+  {
+    id: "cis_controls",
+    name: "CIS Controls",
+    description: "Center for Internet Security authorization",
+    industries: ["*"],
+    countries: ["*"],
+  },
+  {
+    id: "cobit",
+    name: "COBIT",
+    description: "IT governance and management framework",
+    industries: ["*"],
+    countries: ["*"],
+  },
+  {
+    id: "itil",
+    name: "ITIL",
+    description: "IT service management best practices",
+    industries: ["*"],
+    countries: ["*"],
+  },
+  {
+    id: "cmmc",
+    name: "CMMC",
+    description: "Cybersecurity maturity model certification",
+    industries: ["Defense", "*"],
+    countries: ["USA"],
+  },
+  {
+    id: "nerc_cip",
+    name: "NERC CIP",
+    description: "Critical infrastructure protection",
+    industries: ["Energy", "Utilities"],
+    countries: ["USA"],
+  },
+  {
+    id: "ffiec",
+    name: "FFIEC",
+    description: "Financial institution examination council",
+    industries: ["Financial Services"],
+    countries: ["USA"],
+  },
+  {
+    id: "glba",
+    name: "GLBA",
+    description: "Gramm-Leach-Bliley Act financial privacy",
+    industries: ["Financial Services"],
+    countries: ["USA"],
+  },
+  {
+    id: "ferpa",
+    name: "FERPA",
+    description: "Educational records privacy",
+    industries: ["Education"],
+    countries: ["USA"],
+  },
+  {
+    id: "coso",
+    name: "COSO",
+    description: "Committee of Sponsoring Organizations framework",
+    industries: ["*"],
+    countries: ["*"],
+  },
+  {
+    id: "basel_iii",
+    name: "Basel III",
+    description: "International banking regulations",
+    industries: ["Financial Services"],
+    countries: ["*"],
+  },
+  {
+    id: "mifid_ii",
+    name: "MiFID II",
+    description: "Markets in Financial Instruments Directive",
+    industries: ["Financial Services"],
+    regions: ["EU"],
+  },
+  {
+    id: "iso27001",
+    name: "ISO 27001",
+    description: "Information security management",
+    industries: ["*"],
+    countries: ["*"],
+  },
+  {
+    id: "soc2",
+    name: "SOC 2 Type II",
+    description: "Service organization control",
+    industries: ["*"],
+    countries: ["USA", "*"],
+  },
+]
+
+const industries = [
+  "Healthcare",
+  "Financial Services",
+  "Technology",
+  "Manufacturing",
+  "Energy",
+  "Retail",
+  "Government",
+  "Education",
+  "Other",
+]
+
+const countries = [
+  "USA",
+  "Canada",
+  "United Kingdom",
+  "Germany",
+  "France",
+  "Australia",
+  "Japan",
+  "Singapore",
+  "Saudi Arabia",
+  "UAE",
+  "Other",
+]
+
 export default function WorkspacesPage() {
-  const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [workspaceToDelete, setWorkspaceToDelete] = useState<string | null>(null)
   const [editingWorkspace, setEditingWorkspace] = useState<string | null>(null)
+
   const [workspaceName, setWorkspaceName] = useState("")
-  const [workspaceDescription, setWorkspaceDescription] = useState("")
+  const [workspaceType, setWorkspaceType] = useState("team")
+  const [industry, setIndustry] = useState("")
+  const [country, setCountry] = useState("")
+  const [selectedFocusAreas, setSelectedFocusAreas] = useState<string[]>([])
+  const [selectedStandards, setSelectedStandards] = useState<string[]>([])
   const [invitedMembers, setInvitedMembers] = useState<InvitedMember[]>([])
   const [currentEmail, setCurrentEmail] = useState("")
   const [currentRole, setCurrentRole] = useState("viewer")
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const [securityFocus, setSecurityFocus] = useState<string[]>(["endpoint-protection", "network-security"])
-  const [businessFocus, setBusinessFocus] = useState<string[]>(["productivity-tools"])
-  const [complianceStandards, setComplianceStandards] = useState<string[]>(["iso-27001", "nca-framework"])
-  const [selectedStandards, setSelectedStandards] = useState<string[]>([])
+  const [storageLimit, setStorageLimit] = useState("50")
+  const [computeResources, setComputeResources] = useState("medium")
+  const [maxLabDuration, setMaxLabDuration] = useState("4")
+  const [concurrentLabs, setConcurrentLabs] = useState("3")
+  const [requireMFA, setRequireMFA] = useState(false)
+  const [allowGuestAccess, setAllowGuestAccess] = useState(true)
+  const [sessionTimeout, setSessionTimeout] = useState("8")
+  const [ipWhitelist, setIpWhitelist] = useState("")
 
-  const [workspaceSettings, setWorkspaceSettings] = useState({
-    // Resource Management
-    storageLimit: "50",
-    computeLimit: "medium",
-    labDuration: "4",
-    maxConcurrentLabs: "3",
-
-    // Integration Settings
-    allowExternalVMs: false,
-    vmConnectionType: "",
-    vmHostAddress: "",
-    vmPort: "",
-
-    // Security & Access
-    requireMFA: true,
-    allowGuestAccess: false,
-    sessionTimeout: "8",
-    ipWhitelist: "",
-
-    // Notification Preferences
-    labNotifications: true,
-    reportNotifications: true,
-    securityAlerts: true,
-    weeklyDigest: false,
-
-    // Business Context
-    department: "",
-    budgetRange: "",
-    evaluationPurpose: "",
-    projectTimeline: "",
-
-    // Advanced Configuration
-    customBranding: false,
-    apiAccess: false,
-    auditLogging: true,
-    dataRetention: "90",
-  })
-
-  const handleEmailKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && currentEmail.trim()) {
-      e.preventDefault()
-      const email = currentEmail.trim()
-      if (email.includes("@mercygeneral.com") && !invitedMembers.find((m) => m.email === email)) {
-        setInvitedMembers([...invitedMembers, { email, role: currentRole }])
-        setCurrentEmail("")
-        setCurrentRole("viewer")
-      }
-    }
-  }
-
-  const removeMember = (emailToRemove: string) => {
-    setInvitedMembers(invitedMembers.filter((member) => member.email !== emailToRemove))
-  }
-
-  const updateMemberRole = (email: string, newRole: string) => {
-    setInvitedMembers(invitedMembers.map((member) => (member.email === email ? { ...member, role: newRole } : member)))
-  }
-
-  const toggleFocus = (category: "security" | "business", item: string) => {
-    if (category === "security") {
-      setSecurityFocus((prev) => (prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]))
-    } else {
-      setBusinessFocus((prev) => (prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]))
-    }
-  }
-
-  const toggleCompliance = (standard: string) => {
-    setComplianceStandards((prev) =>
-      prev.includes(standard) ? prev.filter((s) => s !== standard) : [...prev, standard],
+  const getRecommendedStandards = () => {
+    return complianceStandards.filter(
+      (standard) =>
+        standard.industries.includes("*") ||
+        standard.industries.includes(industry) ||
+        standard.countries?.includes(country),
     )
   }
 
-  const toggleStandard = (standard: string) => {
-    setSelectedStandards((prev) => (prev.includes(standard) ? prev.filter((s) => s !== standard) : [...prev, standard]))
+  const getAdditionalStandards = () => {
+    const recommended = getRecommendedStandards().map((s) => s.id)
+    return complianceStandards.filter((standard) => !recommended.includes(standard.id))
   }
 
-  const openEditDialog = (workspaceId: string) => {
-    setEditingWorkspace(workspaceId)
-    if (workspaceId === "personal") {
-      setWorkspaceName("Erika Workspace")
-      setWorkspaceDescription("Your personal workspace for professional tools and analysis")
-    } else {
-      setWorkspaceName("TechCorp Security")
-      setWorkspaceDescription("Team workspace for security analysis and collaboration")
-      setInvitedMembers([
-        { email: "john.doe@mercygeneral.com", role: "editor" },
-        { email: "sarah.smith@mercygeneral.com", role: "viewer" },
-        { email: "mike.johnson@mercygeneral.com", role: "admin" },
-      ])
-    }
-    setIsEditOpen(true)
-  }
-
-  const handleDeleteWorkspace = (workspaceName: string) => {
-    setWorkspaceToDelete(workspaceName)
+  const handleDeleteWorkspace = (workspaceId: string) => {
+    setWorkspaceToDelete(workspaceId)
     setIsDeleteOpen(true)
   }
 
   const confirmDeleteWorkspace = () => {
-    console.log(`Deleting workspace: ${workspaceToDelete}`)
-    // Here you would actually delete the workspace
     setIsDeleteOpen(false)
     setWorkspaceToDelete(null)
   }
 
-  const securityFocusOptions = [
-    { id: "endpoint-protection", label: "Endpoint Protection", description: "Device security and threat detection" },
-    { id: "network-security", label: "Network Security", description: "Firewall, IDS/IPS, and network monitoring" },
-    { id: "data-protection", label: "Data Protection", description: "Encryption, DLP, and data governance" },
-    { id: "identity-management", label: "Identity Management", description: "IAM, SSO, and access controls" },
-    { id: "cloud-security", label: "Cloud Security", description: "Cloud infrastructure and service security" },
-    { id: "compliance-management", label: "Compliance Management", description: "Regulatory compliance and auditing" },
-  ]
+  const validateWorkspaceForm = () => {
+    const errors: { [key: string]: string } = {}
 
-  const businessFocusOptions = [
-    { id: "productivity-tools", label: "Productivity Tools", description: "Office suites, collaboration platforms" },
-    {
-      id: "communication-platforms",
-      label: "Communication Platforms",
-      description: "Messaging, video conferencing, VoIP",
-    },
-    {
-      id: "business-analytics",
-      label: "Business Analytics",
-      description: "BI tools, reporting, and data visualization",
-    },
-    { id: "process-automation", label: "Process Automation", description: "Workflow automation and RPA tools" },
-    { id: "team-collaboration", label: "Team Collaboration", description: "Project management and team tools" },
-    { id: "it-infrastructure", label: "IT Infrastructure", description: "Servers, networking, and system management" },
-  ]
+    if (!workspaceName.trim()) {
+      errors.workspaceName = "Workspace name is required"
+    }
 
-  const complianceOptions = [
-    { id: "iso-27001", label: "ISO 27001", description: "Information security management", detected: true },
-    {
-      id: "nca-framework",
-      label: "NCA Critical Infrastructure Framework",
-      description: "Philippines critical infrastructure",
-      detected: true,
-    },
-    { id: "pdpl", label: "PDPL", description: "Philippines Data Privacy Law", detected: true },
-    { id: "hipaa", label: "HIPAA", description: "Healthcare information privacy" },
-    { id: "gdpr", label: "GDPR", description: "European data protection regulation" },
-    { id: "sox", label: "SOX", description: "Sarbanes-Oxley financial compliance" },
-    { id: "pci-dss", label: "PCI DSS", description: "Payment card industry security" },
-    { id: "nist", label: "NIST Framework", description: "Cybersecurity framework" },
-    { id: "iso-22301", label: "ISO 22301", description: "Business continuity management" },
-    { id: "iso-31000", label: "ISO 31000", description: "Risk management principles" },
-    { id: "cobit", label: "COBIT", description: "IT governance and management" },
-    { id: "itil", label: "ITIL", description: "IT service management" },
-    { id: "coso", label: "COSO", description: "Internal control framework" },
-    { id: "fisma", label: "FISMA", description: "Federal information security" },
-    { id: "fedramp", label: "FedRAMP", description: "Federal cloud security" },
-    { id: "ccpa", label: "CCPA", description: "California consumer privacy" },
-  ]
+    if (workspaceName.length > 50) {
+      errors.workspaceName = "Workspace name must be less than 50 characters"
+    }
+
+    if (!industry) {
+      errors.industry = "Industry selection is required"
+    }
+
+    if (!country) {
+      errors.country = "Country selection is required"
+    }
+
+    if (selectedStandards.length === 0) {
+      errors.standards = "At least one compliance standard is required"
+    }
+
+    return errors
+  }
+
+  const handleSubmitWorkspace = () => {
+    const errors = validateWorkspaceForm()
+    setFormErrors(errors)
+
+    if (Object.keys(errors).length === 0) {
+      setIsSubmitting(true)
+      setTimeout(() => {
+        setIsDialogOpen(false)
+        setIsSubmitting(false)
+        // Reset form
+        setWorkspaceName("")
+        setWorkspaceType("team")
+        setIndustry("")
+        setCountry("")
+        setSelectedFocusAreas([])
+        setSelectedStandards([])
+        setInvitedMembers([])
+        setCurrentEmail("")
+        setCurrentRole("viewer")
+        setFormErrors({})
+        setEditingWorkspace(null)
+      }, 1500)
+    }
+  }
+
+  const handleEditWorkspace = (workspaceId: string, workspaceName: string) => {
+    setEditingWorkspace(workspaceId)
+    setWorkspaceName(workspaceName)
+    if (workspaceId === "personal") {
+      setWorkspaceType("personal")
+      setWorkspaceName("Erika-Workspace")
+    } else {
+      setWorkspaceType("team")
+    }
+    setIndustry("Healthcare")
+    setCountry("USA")
+    setIsDialogOpen(true)
+  }
+
+  const handleCreateWorkspace = () => {
+    setEditingWorkspace(null)
+    setWorkspaceName("Erika-Workspace")
+    setWorkspaceType("team") // Only team workspaces can be created
+    setIndustry("Healthcare")
+    setCountry("USA")
+    setSelectedFocusAreas([])
+    setSelectedStandards([])
+    setIsDialogOpen(true)
+  }
+
+  const addMember = () => {
+    if (currentEmail && !invitedMembers.find((m) => m.email === currentEmail)) {
+      setInvitedMembers([...invitedMembers, { email: currentEmail, role: currentRole }])
+      setCurrentEmail("")
+      setCurrentRole("viewer")
+    }
+  }
+
+  const removeMember = (index: number) => {
+    setInvitedMembers(invitedMembers.filter((_, i) => i !== index))
+  }
+
+  const toggleFocusArea = (areaId: string) => {
+    setSelectedFocusAreas((prev) => (prev.includes(areaId) ? prev.filter((id) => id !== areaId) : [...prev, areaId]))
+  }
+
+  const toggleStandard = (standardId: string) => {
+    setSelectedStandards((prev) =>
+      prev.includes(standardId) ? prev.filter((id) => id !== standardId) : [...prev, standardId],
+    )
+    if (formErrors.standards) {
+      setFormErrors((prev) => ({ ...prev, standards: "" }))
+    }
+  }
+
+  const getSecurityFocusAreas = () => focusAreas.filter((area) => area.category === "Security & Compliance Focus")
+  const getBusinessFocusAreas = () => focusAreas.filter((area) => area.category === "Business & Operations Focus")
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Workspace Management</h1>
-          <p className="text-muted-foreground">Manage your workspaces and team collaboration</p>
+          <h1 className="text-3xl font-bold">Workspaces</h1>
+          <p className="text-muted-foreground">Manage your evaluation environments and team collaboration</p>
+          <p className="text-sm text-muted-foreground mt-1">Maximum 3 workspaces per user</p>
         </div>
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-cyan-500 to-blue-500">
-              <Plus className="w-4 h-4 mr-2" />
-              Create Workspace
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Create New Workspace</DialogTitle>
-            </DialogHeader>
+        <Button onClick={handleCreateWorkspace} className="bg-gradient-to-r from-cyan-500 to-blue-500">
+          <Plus className="w-4 h-4 mr-2" />
+          Create Workspace
+        </Button>
+      </div>
 
-            <Tabs defaultValue="team" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="team">Roles & Members</TabsTrigger>
-                <TabsTrigger value="focus">Focus Areas</TabsTrigger>
-                <TabsTrigger value="standards">Standards</TabsTrigger>
-                <TabsTrigger value="configuration">Configuration</TabsTrigger>
-              </TabsList>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 shadow-lg hover:shadow-xl transition-shadow">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md">
+                  <Shield className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-semibold">Healthcare Compliance</CardTitle>
+                  <p className="text-sm text-blue-600 font-medium">Personal Research</p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleEditWorkspace("personal", "Healthcare Compliance")}
+                className="hover:bg-blue-100"
+              >
+                <Edit className="w-4 h-4" />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-white/60 rounded-lg p-4 space-y-3">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="font-medium text-gray-700">Industry:</span>
+                  <p className="text-blue-600">Healthcare</p>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Country:</span>
+                  <p className="text-blue-600">United States</p>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Focus Areas:</span>
+                  <p className="text-blue-600">Security & Compliance</p>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Created:</span>
+                  <p className="text-gray-600">2 weeks ago</p>
+                </div>
+              </div>
+            </div>
 
-              <TabsContent value="team" className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-200">
+                HIPAA
+              </Badge>
+              <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-200">
+                SOC 2
+              </Badge>
+              <Badge variant="secondary" className="bg-gray-100 text-gray-600">
+                +2 more
+              </Badge>
+            </div>
+
+            <div className="flex items-center justify-between pt-3 border-t border-blue-200">
+              <span className="text-sm text-gray-600">Last active: 2 hours ago</span>
+              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                Resume Project
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 shadow-lg hover:shadow-xl transition-shadow">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md">
+                  <Users className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-semibold">IT Security Team</CardTitle>
+                  <p className="text-sm text-blue-600 font-medium">Team Collaboration</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleEditWorkspace("team", "IT Security Team")}
+                  className="hover:bg-blue-100"
+                >
+                  <Edit className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDeleteWorkspace("team")}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-white/60 rounded-lg p-4 space-y-3">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="font-medium text-gray-700">Industry:</span>
+                  <p className="text-blue-600">Technology</p>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Country:</span>
+                  <p className="text-blue-600">United States</p>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Members:</span>
+                  <p className="text-blue-600">4 active</p>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Created:</span>
+                  <p className="text-gray-600">1 month ago</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-200">
+                ISO 27001
+              </Badge>
+              <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-200">
+                NIST
+              </Badge>
+              <Badge variant="secondary" className="bg-gray-100 text-gray-600">
+                +3 more
+              </Badge>
+            </div>
+
+            <div className="flex items-center justify-between pt-3 border-t border-blue-200">
+              <div className="flex -space-x-2">
+                <div className="w-8 h-8 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
+                  <span className="text-xs text-white font-medium">E</span>
+                </div>
+                <div className="w-8 h-8 bg-green-500 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
+                  <span className="text-xs text-white font-medium">M</span>
+                </div>
+                <div className="w-8 h-8 bg-orange-500 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
+                  <span className="text-xs text-white font-medium">+2</span>
+                </div>
+              </div>
+              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                View Details
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingWorkspace ? "Edit Workspace" : "Create New Workspace"}</DialogTitle>
+          </DialogHeader>
+
+          <Tabs defaultValue="roles" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              {workspaceType === "team" && <TabsTrigger value="roles">Roles & Members</TabsTrigger>}
+              <TabsTrigger value="focus">Focus Areas</TabsTrigger>
+              <TabsTrigger value="standards">Standards</TabsTrigger>
+              <TabsTrigger value="configuration">Configuration</TabsTrigger>
+            </TabsList>
+
+            {workspaceType === "team" && (
+              <TabsContent value="roles" className="space-y-6">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="workspace-name">Workspace Name</Label>
+                    <Label htmlFor="workspace-name">Workspace Name *</Label>
                     <Input
                       id="workspace-name"
-                      placeholder="e.g., Marketing Team, Finance Professional"
+                      placeholder="e.g., Erika-Workspace"
                       value={workspaceName}
-                      onChange={(e) => setWorkspaceName(e.target.value)}
+                      onChange={(e) => {
+                        setWorkspaceName(e.target.value)
+                        if (formErrors.workspaceName) {
+                          setFormErrors((prev) => ({ ...prev, workspaceName: "" }))
+                        }
+                      }}
+                      className={formErrors.workspaceName ? "border-red-500" : ""}
                     />
+                    {formErrors.workspaceName && <p className="text-sm text-red-600">{formErrors.workspaceName}</p>}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="workspace-description">Description (Optional)</Label>
-                    <Textarea
-                      id="workspace-description"
-                      placeholder="Brief description of this workspace's purpose..."
-                      value={workspaceDescription}
-                      onChange={(e) => setWorkspaceDescription(e.target.value)}
-                      rows={2}
-                    />
-                  </div>
-
-                  <div className="space-y-4">
-                    <Label>Team Members & Roles</Label>
-
-                    <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                            <span className="text-sm font-medium text-blue-600">E</span>
-                          </div>
-                          <div>
-                            <div className="font-medium">erika@mercygeneral.com</div>
-                            <div className="text-sm text-muted-foreground">You</div>
-                          </div>
-                        </div>
-                        <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                          Admin
-                        </Badge>
-                      </div>
-                    </div>
-
-                    {/* Add Members */}
-                    <div className="space-y-3">
-                      <div className="flex space-x-2">
-                        <Input
-                          placeholder="Enter team member email..."
-                          value={currentEmail}
-                          onChange={(e) => setCurrentEmail(e.target.value)}
-                          onKeyPress={handleEmailKeyPress}
-                          className="flex-1"
-                        />
-                        <Select value={currentRole} onValueChange={setCurrentRole}>
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="viewer">Viewer</SelectItem>
-                            <SelectItem value="editor">Editor</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-3 text-xs">
-                        <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded">
-                          <div className="font-medium text-gray-700 dark:text-gray-300">Viewer</div>
-                          <div className="text-gray-500">View labs, reports, and searches</div>
-                        </div>
-                        <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded">
-                          <div className="font-medium text-gray-700 dark:text-gray-300">Editor</div>
-                          <div className="text-gray-500">Create and modify content</div>
-                        </div>
-                        <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded">
-                          <div className="font-medium text-gray-700 dark:text-gray-300">Admin</div>
-                          <div className="text-gray-500">Full workspace management</div>
-                        </div>
-                      </div>
-
-                      {/* Invited Members List */}
-                      {invitedMembers.length > 0 && (
-                        <div className="space-y-2">
-                          <Label className="text-sm">Invited Members</Label>
-                          {invitedMembers.map((member, index) => (
-                            <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                              <div className="flex items-center space-x-3">
-                                <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                                  <span className="text-sm font-medium">{member.email[0].toUpperCase()}</span>
-                                </div>
-                                <span className="font-medium">{member.email}</span>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Select
-                                  value={member.role}
-                                  onValueChange={(role) => updateMemberRole(member.email, role)}
-                                >
-                                  <SelectTrigger className="w-24">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="viewer">Viewer</SelectItem>
-                                    <SelectItem value="editor">Editor</SelectItem>
-                                    <SelectItem value="admin">Admin</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <Button variant="ghost" size="sm" onClick={() => removeMember(member.email)}>
-                                  <X className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            </div>
+                    <Label>Industry *</Label>
+                    <div className="relative">
+                      <Select
+                        value={industry}
+                        onValueChange={(value) => {
+                          setIndustry(value)
+                          if (formErrors.industry) {
+                            setFormErrors((prev) => ({ ...prev, industry: "" }))
+                          }
+                        }}
+                      >
+                        <SelectTrigger className={formErrors.industry ? "border-red-500" : ""}>
+                          <SelectValue placeholder="Select industry" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {industries.map((ind) => (
+                            <SelectItem key={ind} value={ind}>
+                              {ind}
+                            </SelectItem>
                           ))}
+                        </SelectContent>
+                      </Select>
+                      {industry && (
+                        <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
+                          <Sparkles className="w-4 h-4 text-blue-500" />
                         </div>
                       )}
                     </div>
+                    {formErrors.industry && <p className="text-sm text-red-600">{formErrors.industry}</p>}
                   </div>
-                </div>
-              </TabsContent>
 
-              <TabsContent value="focus" className="space-y-6">
-                {/* Security & Compliance Focus Areas */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Shield className="w-5 h-5 text-blue-500" />
-                    <Label className="text-base font-medium">Security & Compliance Focus</Label>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Select security and compliance areas for evaluation and testing
-                  </p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      {
-                        id: "endpoint-protection",
-                        label: "Endpoint Protection",
-                        description: "Antivirus, EDR, and endpoint security solutions",
-                      },
-                      {
-                        id: "network-security",
-                        label: "Network Security",
-                        description: "Firewalls, IDS/IPS, and network monitoring",
-                      },
-                      {
-                        id: "identity-access",
-                        label: "Identity & Access Management",
-                        description: "SSO, MFA, and identity governance",
-                      },
-                      {
-                        id: "data-protection",
-                        label: "Data Protection",
-                        description: "DLP, encryption, and data governance",
-                      },
-                      {
-                        id: "cloud-security",
-                        label: "Cloud Security",
-                        description: "CSPM, CWPP, and cloud-native security",
-                      },
-                      {
-                        id: "vulnerability-management",
-                        label: "Vulnerability Management",
-                        description: "Scanning, assessment, and remediation",
-                      },
-                      {
-                        id: "incident-response",
-                        label: "Incident Response",
-                        description: "SOAR, forensics, and incident management",
-                      },
-                      {
-                        id: "compliance-management",
-                        label: "Compliance Management",
-                        description: "GRC, audit, and regulatory compliance",
-                      },
-                      {
-                        id: "threat-intelligence",
-                        label: "Threat Intelligence",
-                        description: "Threat feeds, analysis, and hunting",
-                      },
-                      {
-                        id: "security-awareness",
-                        label: "Security Awareness",
-                        description: "Training, phishing simulation, and education",
-                      },
-                      {
-                        id: "application-security",
-                        label: "Application Security",
-                        description: "SAST, DAST, and application protection",
-                      },
-                      {
-                        id: "zero-trust",
-                        label: "Zero Trust Architecture",
-                        description: "Zero trust network and security frameworks",
-                      },
-                    ].map((option) => (
-                      <div
-                        key={option.id}
-                        className={`p-3 border rounded-lg cursor-pointer transition-all ${
-                          securityFocus.includes(option.id)
-                            ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
-                            : "border-gray-200 hover:border-blue-300"
-                        }`}
-                        onClick={() => toggleFocus("security", option.id)}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="font-medium">{option.label}</div>
-                            {securityFocus.includes(option.id) && <CheckCircle2 className="w-4 h-4 text-blue-500" />}
-                          </div>
-                        </div>
-                        <div className="text-sm text-muted-foreground mt-1">{option.description}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Business & Operations Focus */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <BarChart3 className="w-5 h-5 text-blue-500" />
-                    <Label className="text-base font-medium">Business & Operations Focus</Label>
-                  </div>
-                  <p className="text-sm text-muted-foreground">Select business and operational tools for evaluation</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      {
-                        id: "business-intelligence",
-                        label: "Business Intelligence",
-                        description: "Analytics, reporting, and data visualization",
-                      },
-                      {
-                        id: "collaboration-tools",
-                        label: "Collaboration Tools",
-                        description: "Communication, file sharing, and teamwork",
-                      },
-                      {
-                        id: "project-management",
-                        label: "Project Management",
-                        description: "Planning, tracking, and resource management",
-                      },
-                      {
-                        id: "customer-relationship",
-                        label: "Customer Relationship Management",
-                        description: "CRM, sales, and customer service tools",
-                      },
-                      {
-                        id: "enterprise-resource",
-                        label: "Enterprise Resource Planning",
-                        description: "ERP, finance, and business operations",
-                      },
-                      {
-                        id: "human-resources",
-                        label: "Human Resources",
-                        description: "HR management, payroll, and employee tools",
-                      },
-                      {
-                        id: "marketing-automation",
-                        label: "Marketing Automation",
-                        description: "Email marketing, campaigns, and lead generation",
-                      },
-                      {
-                        id: "document-management",
-                        label: "Document Management",
-                        description: "Document storage, workflow, and collaboration",
-                      },
-                      {
-                        id: "backup-recovery",
-                        label: "Backup & Recovery",
-                        description: "Data backup, disaster recovery, and continuity",
-                      },
-                      {
-                        id: "monitoring-observability",
-                        label: "Monitoring & Observability",
-                        description: "System monitoring, logging, and performance",
-                      },
-                      {
-                        id: "automation-orchestration",
-                        label: "Automation & Orchestration",
-                        description: "Workflow automation and process optimization",
-                      },
-                      {
-                        id: "integration-platforms",
-                        label: "Integration Platforms",
-                        description: "API management, data integration, and connectivity",
-                      },
-                    ].map((option) => (
-                      <div
-                        key={option.id}
-                        className={`p-3 border rounded-lg cursor-pointer transition-all ${
-                          businessFocus.includes(option.id)
-                            ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
-                            : "border-gray-200 hover:border-blue-300"
-                        }`}
-                        onClick={() => toggleFocus("business", option.id)}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="font-medium">{option.label}</div>
-                            {businessFocus.includes(option.id) && <CheckCircle2 className="w-4 h-4 text-blue-500" />}
-                          </div>
-                        </div>
-                        <div className="text-sm text-muted-foreground mt-1">{option.description}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="standards" className="space-y-6">
-                <div className="space-y-4">
-                  <Label className="text-base font-medium">Compliance & Regulatory Standards</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Select applicable compliance frameworks and standards for your workspace
-                  </p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      { id: "hipaa", label: "HIPAA", description: "Healthcare data protection and privacy" },
-                      { id: "pci-dss", label: "PCI DSS", description: "Payment card industry data security" },
-                      { id: "sox", label: "SOX", description: "Sarbanes-Oxley financial reporting" },
-                      { id: "gdpr", label: "GDPR", description: "European data protection regulation" },
-                      { id: "ccpa", label: "CCPA", description: "California consumer privacy act" },
-                      { id: "iso-27001", label: "ISO 27001", description: "Information security management" },
-                      {
-                        id: "nist-csf",
-                        label: "NIST Cybersecurity Framework",
-                        description: "National cybersecurity standards",
-                      },
-                      { id: "fedramp", label: "FedRAMP", description: "Federal cloud security authorization" },
-                      { id: "fisma", label: "FISMA", description: "Federal information security management" },
-                      {
-                        id: "cis-controls",
-                        label: "CIS Controls",
-                        description: "Center for Internet Security controls",
-                      },
-                      { id: "cobit", label: "COBIT", description: "IT governance and management framework" },
-                      { id: "itil", label: "ITIL", description: "IT service management best practices" },
-                      { id: "cmmc", label: "CMMC", description: "Cybersecurity maturity model certification" },
-                      { id: "nerc-cip", label: "NERC CIP", description: "Critical infrastructure protection" },
-                      { id: "ffiec", label: "FFIEC", description: "Financial institution examination council" },
-                      { id: "glba", label: "GLBA", description: "Gramm-Leach-Bliley Act financial privacy" },
-                      { id: "ferpa", label: "FERPA", description: "Educational records privacy" },
-                      { id: "coso", label: "COSO", description: "Committee of Sponsoring Organizations framework" },
-                      { id: "basel-iii", label: "Basel III", description: "International banking regulations" },
-                      { id: "mifid-ii", label: "MiFID II", description: "Markets in Financial Instruments Directive" },
-                    ].map((standard) => (
-                      <div
-                        key={standard.id}
-                        className={`p-3 border rounded-lg cursor-pointer transition-all ${
-                          selectedStandards.includes(standard.id)
-                            ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
-                            : "border-gray-200 hover:border-blue-300"
-                        }`}
-                        onClick={() => toggleStandard(standard.id)}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="font-medium">{standard.label}</div>
-                            {selectedStandards.includes(standard.id) && (
-                              <CheckCircle2 className="w-4 h-4 text-blue-500" />
-                            )}
-                          </div>
-                        </div>
-                        <div className="text-sm text-muted-foreground mt-1">{standard.description}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="configuration" className="space-y-6">
-                {/* Resource Management */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <BarChart3 className="w-5 h-5 text-blue-500" />
-                    <Label className="text-base font-medium">Resource Management</Label>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Storage Limit (GB)</Label>
+                  <div className="space-y-2">
+                    <Label>Country *</Label>
+                    <div className="relative">
                       <Select
-                        value={workspaceSettings.storageLimit}
-                        onValueChange={(value) => setWorkspaceSettings((prev) => ({ ...prev, storageLimit: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="25">25 GB</SelectItem>
-                          <SelectItem value="50">50 GB</SelectItem>
-                          <SelectItem value="100">100 GB</SelectItem>
-                          <SelectItem value="250">250 GB</SelectItem>
-                          <SelectItem value="500">500 GB</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Compute Resources</Label>
-                      <Select
-                        value={workspaceSettings.computeLimit}
-                        onValueChange={(value) => setWorkspaceSettings((prev) => ({ ...prev, computeLimit: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="basic">Basic (2 vCPU, 4GB RAM)</SelectItem>
-                          <SelectItem value="medium">Medium (4 vCPU, 8GB RAM)</SelectItem>
-                          <SelectItem value="high">High (8 vCPU, 16GB RAM)</SelectItem>
-                          <SelectItem value="premium">Premium (16 vCPU, 32GB RAM)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Max Lab Duration (hours)</Label>
-                      <Select
-                        value={workspaceSettings.labDuration}
-                        onValueChange={(value) => setWorkspaceSettings((prev) => ({ ...prev, labDuration: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="2">2 hours</SelectItem>
-                          <SelectItem value="4">4 hours</SelectItem>
-                          <SelectItem value="8">8 hours</SelectItem>
-                          <SelectItem value="24">24 hours</SelectItem>
-                          <SelectItem value="72">72 hours</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Concurrent Labs</Label>
-                      <Select
-                        value={workspaceSettings.maxConcurrentLabs}
-                        onValueChange={(value) =>
-                          setWorkspaceSettings((prev) => ({ ...prev, maxConcurrentLabs: value }))
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">1 lab</SelectItem>
-                          <SelectItem value="3">3 labs</SelectItem>
-                          <SelectItem value="5">5 labs</SelectItem>
-                          <SelectItem value="10">10 labs</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Security & Access */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Shield className="w-5 h-5 text-blue-500" />
-                    <Label className="text-base font-medium">Security & Access Control</Label>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
-                      <div>
-                        <div className="font-medium">Require Multi-Factor Authentication</div>
-                        <div className="text-sm text-muted-foreground">All workspace members must use MFA</div>
-                      </div>
-                      <Switch
-                        checked={workspaceSettings.requireMFA}
-                        onCheckedChange={(checked) =>
-                          setWorkspaceSettings((prev) => ({ ...prev, requireMFA: checked }))
-                        }
-                      />
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
-                      <div>
-                        <div className="font-medium">Allow Guest Access</div>
-                        <div className="text-sm text-muted-foreground">Temporary access for external users</div>
-                      </div>
-                      <Switch
-                        checked={workspaceSettings.allowGuestAccess}
-                        onCheckedChange={(checked) =>
-                          setWorkspaceSettings((prev) => ({ ...prev, allowGuestAccess: checked }))
-                        }
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Session Timeout (hours)</Label>
-                        <Select
-                          value={workspaceSettings.sessionTimeout}
-                          onValueChange={(value) =>
-                            setWorkspaceSettings((prev) => ({ ...prev, sessionTimeout: value }))
+                        value={country}
+                        onValueChange={(value) => {
+                          setCountry(value)
+                          if (formErrors.country) {
+                            setFormErrors((prev) => ({ ...prev, country: "" }))
                           }
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="1">1 hour</SelectItem>
-                            <SelectItem value="4">4 hours</SelectItem>
-                            <SelectItem value="8">8 hours</SelectItem>
-                            <SelectItem value="24">24 hours</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>IP Whitelist (Optional)</Label>
-                        <Input
-                          placeholder="192.168.1.0/24, 10.0.0.0/8"
-                          value={workspaceSettings.ipWhitelist}
-                          onChange={(e) => setWorkspaceSettings((prev) => ({ ...prev, ipWhitelist: e.target.value }))}
-                        />
-                      </div>
+                        }}
+                      >
+                        <SelectTrigger className={formErrors.country ? "border-red-500" : ""}>
+                          <SelectValue placeholder="Select country" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {countries.map((ctry) => (
+                            <SelectItem key={ctry} value={ctry}>
+                              {ctry}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {country && (
+                        <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
+                          <Sparkles className="w-4 h-4 text-blue-500" />
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </div>
-
-                {/* Integration Settings */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Settings className="w-5 h-5 text-blue-500" />
-                    <Label className="text-base font-medium">Integration Settings</Label>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
-                      <div>
-                        <div className="font-medium">External VM Integration</div>
-                        <div className="text-sm text-muted-foreground">
-                          Connect to external virtualization platforms
-                        </div>
-                      </div>
-                      <Switch
-                        checked={workspaceSettings.allowExternalVMs}
-                        onCheckedChange={(checked) =>
-                          setWorkspaceSettings((prev) => ({ ...prev, allowExternalVMs: checked }))
-                        }
-                      />
-                    </div>
-                    {workspaceSettings.allowExternalVMs && (
-                      <div className="grid grid-cols-2 gap-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg">
-                        <div className="space-y-2">
-                          <Label>VM Platform</Label>
-                          <Select
-                            value={workspaceSettings.vmConnectionType}
-                            onValueChange={(value) =>
-                              setWorkspaceSettings((prev) => ({ ...prev, vmConnectionType: value }))
-                            }
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select platform" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="vmware">VMware vSphere</SelectItem>
-                              <SelectItem value="hyperv">Microsoft Hyper-V</SelectItem>
-                              <SelectItem value="virtualbox">Oracle VirtualBox</SelectItem>
-                              <SelectItem value="kvm">KVM/QEMU</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Host Address</Label>
-                          <Input
-                            placeholder="192.168.1.100"
-                            value={workspaceSettings.vmHostAddress}
-                            onChange={(e) =>
-                              setWorkspaceSettings((prev) => ({ ...prev, vmHostAddress: e.target.value }))
-                            }
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-
-            <div className="flex space-x-2 pt-4 border-t">
-              <Button variant="outline" className="flex-1 bg-transparent" onClick={() => setIsCreateOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500"
-                onClick={() => {
-                  setIsCreateOpen(false)
-                  // Reset form
-                  setWorkspaceName("")
-                  setWorkspaceDescription("")
-                  setInvitedMembers([])
-                  setCurrentEmail("")
-                  setCurrentRole("viewer")
-                  setSecurityFocus(["endpoint-protection", "network-security"])
-                  setBusinessFocus(["productivity-tools"])
-                  setComplianceStandards(["iso-27001", "nca-framework"])
-                }}
-              >
-                Create Workspace
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-          <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Edit Workspace</DialogTitle>
-            </DialogHeader>
-
-            <Tabs defaultValue="team" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="team">Roles & Members</TabsTrigger>
-                <TabsTrigger value="focus">Focus Areas</TabsTrigger>
-                <TabsTrigger value="standards">Standards</TabsTrigger>
-                <TabsTrigger value="configuration">Configuration</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="team" className="space-y-4">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-workspace-name">Workspace Name</Label>
-                    <Input
-                      id="edit-workspace-name"
-                      value={workspaceName}
-                      onChange={(e) => setWorkspaceName(e.target.value)}
-                    />
+                    {formErrors.country && <p className="text-sm text-red-600">{formErrors.country}</p>}
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-workspace-description">Description</Label>
-                    <Textarea
-                      id="edit-workspace-description"
-                      value={workspaceDescription}
-                      onChange={(e) => setWorkspaceDescription(e.target.value)}
-                      rows={2}
-                    />
-                  </div>
-
-                  {editingWorkspace !== "personal" && (
-                    <div className="space-y-4">
-                      <Label>Team Members & Roles</Label>
+                  {/* Team Members Section */}
+                  {workspaceType === "team" && (
+                    <div className="space-y-4 pt-4 border-t">
+                      <Label>Team Members</Label>
 
                       <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
                         <div className="flex items-center justify-between">
@@ -873,9 +771,37 @@ export default function WorkspacesPage() {
                         </div>
                       </div>
 
+                      <div className="space-y-3 p-4 border rounded-lg">
+                        <Label>Invite Team Members</Label>
+                        <div className="flex space-x-2">
+                          <Input
+                            placeholder="colleague@mercygeneral.com"
+                            value={currentEmail}
+                            onChange={(e) => setCurrentEmail(e.target.value)}
+                            className="flex-1"
+                          />
+                          <Select value={currentRole} onValueChange={setCurrentRole}>
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="viewer">Viewer</SelectItem>
+                              <SelectItem value="editor">Editor</SelectItem>
+                              <SelectItem value="admin">Admin</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Button onClick={addMember} disabled={!currentEmail}>
+                            Add
+                          </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Hint: Use your organization domain (@mercygeneral.com)
+                        </p>
+                      </div>
+
                       {invitedMembers.length > 0 && (
                         <div className="space-y-2">
-                          <Label className="text-sm">Team Members</Label>
+                          <Label className="text-sm">Invited Members</Label>
                           {invitedMembers.map((member, index) => (
                             <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                               <div className="flex items-center space-x-3">
@@ -885,20 +811,8 @@ export default function WorkspacesPage() {
                                 <span className="font-medium">{member.email}</span>
                               </div>
                               <div className="flex items-center space-x-2">
-                                <Select
-                                  value={member.role}
-                                  onValueChange={(role) => updateMemberRole(member.email, role)}
-                                >
-                                  <SelectTrigger className="w-24">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="viewer">Viewer</SelectItem>
-                                    <SelectItem value="editor">Editor</SelectItem>
-                                    <SelectItem value="admin">Admin</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <Button variant="ghost" size="sm" onClick={() => removeMember(member.email)}>
+                                <Badge variant="outline">{member.role}</Badge>
+                                <Button variant="ghost" size="sm" onClick={() => removeMember(index)}>
                                   <X className="w-4 h-4" />
                                 </Button>
                               </div>
@@ -910,156 +824,126 @@ export default function WorkspacesPage() {
                   )}
                 </div>
               </TabsContent>
+            )}
 
-              <TabsContent value="focus" className="space-y-6">
-                {/* Same focus areas content as create dialog */}
+            <TabsContent value="focus" className="space-y-6">
+              <div className="space-y-6">
+                {/* Security & Compliance Focus */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2">
                     <Shield className="w-5 h-5 text-blue-500" />
-                    <Label className="text-base font-medium">Protection & Verification Focus</Label>
+                    <Label className="text-base font-medium">Security & Compliance Focus</Label>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Select areas where you evaluate protection and verification solutions
+                    Select security and compliance areas for evaluation and testing
                   </p>
                   <div className="grid grid-cols-2 gap-3">
-                    {securityFocusOptions.map((option) => (
+                    {getSecurityFocusAreas().map((area) => (
                       <div
-                        key={option.id}
+                        key={area.id}
                         className={`p-3 border rounded-lg cursor-pointer transition-all ${
-                          securityFocus.includes(option.id)
+                          selectedFocusAreas.includes(area.id)
                             ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
                             : "border-gray-200 hover:border-blue-300"
                         }`}
-                        onClick={() => toggleFocus("security", option.id)}
+                        onClick={() => toggleFocusArea(area.id)}
                       >
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="font-medium">{option.label}</div>
-                            {securityFocus.includes(option.id) && <CheckCircle2 className="w-4 h-4 text-blue-500" />}
-                          </div>
+                          <div className="font-medium">{area.name}</div>
+                          {selectedFocusAreas.includes(area.id) && <CheckCircle2 className="w-4 h-4 text-blue-500" />}
                         </div>
-                        <div className="text-sm text-muted-foreground mt-1">{option.description}</div>
+                        <div className="text-sm text-muted-foreground mt-1">{area.description}</div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Business Utility Focus */}
+                {/* Business & Operations Focus */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2">
-                    <BarChart3 className="w-5 h-5 text-blue-500" />
-                    <Label className="text-base font-medium">Business Utility Focus</Label>
+                    <Settings className="w-5 h-5 text-blue-500" />
+                    <Label className="text-base font-medium">Business & Operations Focus</Label>
                   </div>
-                  <p className="text-sm text-muted-foreground">Select business tools and utilities you evaluate</p>
+                  <p className="text-sm text-muted-foreground">Select business and operational tools for evaluation</p>
                   <div className="grid grid-cols-2 gap-3">
-                    {businessFocusOptions.map((option) => (
+                    {getBusinessFocusAreas().map((area) => (
                       <div
-                        key={option.id}
+                        key={area.id}
                         className={`p-3 border rounded-lg cursor-pointer transition-all ${
-                          businessFocus.includes(option.id)
+                          selectedFocusAreas.includes(area.id)
                             ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
                             : "border-gray-200 hover:border-blue-300"
                         }`}
-                        onClick={() => toggleFocus("business", option.id)}
+                        onClick={() => toggleFocusArea(area.id)}
                       >
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="font-medium">{option.label}</div>
-                            {businessFocus.includes(option.id) && <CheckCircle2 className="w-4 h-4 text-blue-500" />}
-                          </div>
+                          <div className="font-medium">{area.name}</div>
+                          {selectedFocusAreas.includes(area.id) && <CheckCircle2 className="w-4 h-4 text-blue-500" />}
                         </div>
-                        <div className="text-sm text-muted-foreground mt-1">{option.description}</div>
+                        <div className="text-sm text-muted-foreground mt-1">{area.description}</div>
                       </div>
                     ))}
                   </div>
                 </div>
-              </TabsContent>
+              </div>
+            </TabsContent>
 
-              <TabsContent value="standards" className="space-y-6">
-                {/* Same standards content as create dialog */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Sparkles className="w-5 h-5 text-blue-500" />
-                    <Label className="text-base font-medium">Professional Standards</Label>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Based on your industry (Healthcare) and location (Asia • Philippines), we've highlighted relevant
-                    standards.
-                  </p>
+            <TabsContent value="standards" className="space-y-6">
+              <div className="space-y-6">
+                <div className="flex items-center space-x-2">
+                  <Shield className="w-5 h-5 text-blue-500" />
+                  <Label className="text-base font-medium">Compliance & Regulatory Standards</Label>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Select applicable compliance frameworks and standards for your workspace.
+                  <br />
+                  <span className="text-blue-600 font-medium">
+                    Note: These standards apply globally and will be filtered based on your selected country's
+                    requirements.
+                  </span>
+                </p>
 
-                  <div className="space-y-3">
-                    <div className="text-sm font-medium text-blue-600">Recommended for your context:</div>
-                    <div className="grid grid-cols-1 gap-2">
-                      {complianceOptions
-                        .filter((option) => option.detected)
-                        .map((option) => (
-                          <div
-                            key={option.id}
-                            className={`p-2 border rounded cursor-pointer transition-all ${
-                              complianceStandards.includes(option.id)
-                                ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
-                                : "border-blue-200 bg-blue-25"
-                            }`}
-                            onClick={() => toggleCompliance(option.id)}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center space-x-2">
-                                <Sparkles className="w-3 h-3 text-blue-500" />
-                                <div className="text-sm font-medium">{option.label}</div>
-                                {complianceStandards.includes(option.id) && (
-                                  <CheckCircle2 className="w-3 h-3 text-blue-500" />
-                                )}
-                              </div>
-                            </div>
-                            <div className="text-xs text-muted-foreground mt-1 ml-5">{option.description}</div>
-                          </div>
-                        ))}
-                    </div>
+                {formErrors.standards && <p className="text-sm text-red-600">{formErrors.standards}</p>}
 
-                    <div className="text-sm font-medium text-gray-600 mt-6">Additional standards (if applicable):</div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {complianceOptions
-                        .filter((option) => !option.detected)
-                        .map((option) => (
-                          <div
-                            key={option.id}
-                            className={`p-2 border rounded cursor-pointer transition-all ${
-                              complianceStandards.includes(option.id)
-                                ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
-                                : "border-gray-200 hover:border-blue-300"
-                            }`}
-                            onClick={() => toggleCompliance(option.id)}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center space-x-1">
-                                <div className="text-sm font-medium">{option.label}</div>
-                                {complianceStandards.includes(option.id) && (
-                                  <CheckCircle2 className="w-3 h-3 text-blue-500" />
-                                )}
-                              </div>
-                            </div>
-                            <div className="text-xs text-muted-foreground mt-1">{option.description}</div>
-                          </div>
-                        ))}
-                    </div>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    {complianceStandards.map((standard) => (
+                      <div
+                        key={standard.id}
+                        className={`p-3 border rounded-lg cursor-pointer transition-all ${
+                          selectedStandards.includes(standard.id)
+                            ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
+                            : "border-blue-200 hover:border-blue-300"
+                        }`}
+                        onClick={() => toggleStandard(standard.id)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="font-medium">{standard.name}</div>
+                          {selectedStandards.includes(standard.id) && (
+                            <CheckCircle2 className="w-4 h-4 text-blue-500" />
+                          )}
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">{standard.description}</div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </TabsContent>
+              </div>
+            </TabsContent>
 
-              <TabsContent value="configuration" className="space-y-6">
+            <TabsContent value="configuration" className="space-y-6">
+              <div className="space-y-6">
                 {/* Resource Management */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2">
-                    <BarChart3 className="w-5 h-5 text-blue-500" />
+                    <Database className="w-5 h-5 text-blue-500" />
                     <Label className="text-base font-medium">Resource Management</Label>
                   </div>
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Storage Limit (GB)</Label>
-                      <Select
-                        value={workspaceSettings.storageLimit}
-                        onValueChange={(value) => setWorkspaceSettings((prev) => ({ ...prev, storageLimit: value }))}
-                      >
+                      <Select value={storageLimit} onValueChange={setStorageLimit}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -1068,33 +952,27 @@ export default function WorkspacesPage() {
                           <SelectItem value="50">50 GB</SelectItem>
                           <SelectItem value="100">100 GB</SelectItem>
                           <SelectItem value="250">250 GB</SelectItem>
-                          <SelectItem value="500">500 GB</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
+
                     <div className="space-y-2">
                       <Label>Compute Resources</Label>
-                      <Select
-                        value={workspaceSettings.computeLimit}
-                        onValueChange={(value) => setWorkspaceSettings((prev) => ({ ...prev, computeLimit: value }))}
-                      >
+                      <Select value={computeResources} onValueChange={setComputeResources}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="basic">Basic (2 vCPU, 4GB RAM)</SelectItem>
+                          <SelectItem value="small">Small (2 vCPU, 4GB RAM)</SelectItem>
                           <SelectItem value="medium">Medium (4 vCPU, 8GB RAM)</SelectItem>
-                          <SelectItem value="high">High (8 vCPU, 16GB RAM)</SelectItem>
-                          <SelectItem value="premium">Premium (16 vCPU, 32GB RAM)</SelectItem>
+                          <SelectItem value="large">Large (8 vCPU, 16GB RAM)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
+
                     <div className="space-y-2">
                       <Label>Max Lab Duration (hours)</Label>
-                      <Select
-                        value={workspaceSettings.labDuration}
-                        onValueChange={(value) => setWorkspaceSettings((prev) => ({ ...prev, labDuration: value }))}
-                      >
+                      <Select value={maxLabDuration} onValueChange={setMaxLabDuration}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -1103,72 +981,55 @@ export default function WorkspacesPage() {
                           <SelectItem value="4">4 hours</SelectItem>
                           <SelectItem value="8">8 hours</SelectItem>
                           <SelectItem value="24">24 hours</SelectItem>
-                          <SelectItem value="72">72 hours</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
+
                     <div className="space-y-2">
                       <Label>Concurrent Labs</Label>
-                      <Select
-                        value={workspaceSettings.maxConcurrentLabs}
-                        onValueChange={(value) =>
-                          setWorkspaceSettings((prev) => ({ ...prev, maxConcurrentLabs: value }))
-                        }
-                      >
+                      <Select value={concurrentLabs} onValueChange={setConcurrentLabs}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="1">1 lab</SelectItem>
-                          <SelectItem value="3">3 labs</SelectItem>
-                          <SelectItem value="5">5 labs</SelectItem>
-                          <SelectItem value="10">10 labs</SelectItem>
+                          <SelectItem value="1">1 Lab</SelectItem>
+                          <SelectItem value="3">3 Labs</SelectItem>
+                          <SelectItem value="5">5 Labs</SelectItem>
+                          <SelectItem value="10">10 Labs</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
                 </div>
 
-                {/* Security & Access */}
+                {/* Security & Access Control */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2">
                     <Shield className="w-5 h-5 text-blue-500" />
                     <Label className="text-base font-medium">Security & Access Control</Label>
                   </div>
+
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                    <div className="flex items-center justify-between">
                       <div>
-                        <div className="font-medium">Require Multi-Factor Authentication</div>
-                        <div className="text-sm text-muted-foreground">All workspace members must use MFA</div>
+                        <Label>Require Multi-Factor Authentication</Label>
+                        <p className="text-sm text-muted-foreground">All workspace members must use MFA</p>
                       </div>
-                      <Switch
-                        checked={workspaceSettings.requireMFA}
-                        onCheckedChange={(checked) =>
-                          setWorkspaceSettings((prev) => ({ ...prev, requireMFA: checked }))
-                        }
-                      />
+                      <Switch checked={requireMFA} onCheckedChange={setRequireMFA} />
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
+
+                    <div className="flex items-center justify-between">
                       <div>
-                        <div className="font-medium">Allow Guest Access</div>
-                        <div className="text-sm text-muted-foreground">Temporary access for external users</div>
+                        <Label>Allow Guest Access</Label>
+                        <p className="text-sm text-muted-foreground">Temporary access for external users</p>
                       </div>
-                      <Switch
-                        checked={workspaceSettings.allowGuestAccess}
-                        onCheckedChange={(checked) =>
-                          setWorkspaceSettings((prev) => ({ ...prev, allowGuestAccess: checked }))
-                        }
-                      />
+                      <Switch checked={allowGuestAccess} onCheckedChange={setAllowGuestAccess} />
                     </div>
+
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>Session Timeout (hours)</Label>
-                        <Select
-                          value={workspaceSettings.sessionTimeout}
-                          onValueChange={(value) =>
-                            setWorkspaceSettings((prev) => ({ ...prev, sessionTimeout: value }))
-                          }
-                        >
+                        <Select value={sessionTimeout} onValueChange={setSessionTimeout}>
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
@@ -1180,12 +1041,13 @@ export default function WorkspacesPage() {
                           </SelectContent>
                         </Select>
                       </div>
+
                       <div className="space-y-2">
                         <Label>IP Whitelist (Optional)</Label>
                         <Input
-                          placeholder="192.168.1.0/24, 10.0.0.0/8"
-                          value={workspaceSettings.ipWhitelist}
-                          onChange={(e) => setWorkspaceSettings((prev) => ({ ...prev, ipWhitelist: e.target.value }))}
+                          placeholder="192.168.1.0 / 24, 10.0.0.0 / 8"
+                          value={ipWhitelist}
+                          onChange={(e) => setIpWhitelist(e.target.value)}
                         />
                       </div>
                     </div>
@@ -1195,258 +1057,56 @@ export default function WorkspacesPage() {
                 {/* Integration Settings */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2">
-                    <Settings className="w-5 h-5 text-blue-500" />
+                    <Globe className="w-5 h-5 text-blue-500" />
                     <Label className="text-base font-medium">Integration Settings</Label>
                   </div>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
-                      <div>
-                        <div className="font-medium">External VM Integration</div>
-                        <div className="text-sm text-muted-foreground">
-                          Connect to external virtualization platforms
-                        </div>
-                      </div>
-                      <Switch
-                        checked={workspaceSettings.allowExternalVMs}
-                        onCheckedChange={(checked) =>
-                          setWorkspaceSettings((prev) => ({ ...prev, allowExternalVMs: checked }))
-                        }
-                      />
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label>Require Multi-Factor Authentication</Label>
+                      <p className="text-sm text-muted-foreground">All workspace members must use MFA</p>
                     </div>
-                    {workspaceSettings.allowExternalVMs && (
-                      <div className="grid grid-cols-2 gap-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg">
-                        <div className="space-y-2">
-                          <Label>VM Platform</Label>
-                          <Select
-                            value={workspaceSettings.vmConnectionType}
-                            onValueChange={(value) =>
-                              setWorkspaceSettings((prev) => ({ ...prev, vmConnectionType: value }))
-                            }
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select platform" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="vmware">VMware vSphere</SelectItem>
-                              <SelectItem value="hyperv">Microsoft Hyper-V</SelectItem>
-                              <SelectItem value="virtualbox">Oracle VirtualBox</SelectItem>
-                              <SelectItem value="kvm">KVM/QEMU</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Host Address</Label>
-                          <Input
-                            placeholder="192.168.1.100"
-                            value={workspaceSettings.vmHostAddress}
-                            onChange={(e) =>
-                              setWorkspaceSettings((prev) => ({ ...prev, vmHostAddress: e.target.value }))
-                            }
-                          />
-                        </div>
-                      </div>
-                    )}
+                    <Switch checked={false} />
                   </div>
                 </div>
-              </TabsContent>
-            </Tabs>
+              </div>
+            </TabsContent>
+          </Tabs>
 
-            <div className="flex space-x-2 pt-4 border-t">
-              <Button variant="outline" className="flex-1 bg-transparent" onClick={() => setIsEditOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500"
-                onClick={() => {
-                  setIsEditOpen(false)
-                  setEditingWorkspace(null)
-                }}
-              >
-                Save Changes
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+          <div className="flex justify-end space-x-2 pt-4 border-t">
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmitWorkspace}
+              disabled={isSubmitting}
+              className="bg-gradient-to-r from-cyan-500 to-blue-500"
+            >
+              {isSubmitting ? "Saving..." : editingWorkspace ? "Update Workspace" : "Create Workspace"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-        {/* Delete Confirmation Dialog */}
-        <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-red-600">Delete Workspace</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Are you sure you want to delete <strong>{workspaceToDelete}</strong>? This action cannot be undone.
-              </p>
-              <div className="bg-red-50 dark:bg-red-950 p-3 rounded-lg">
-                <div className="text-sm text-red-800 dark:text-red-200">
-                  <strong>This will permanently delete:</strong>
-                  <ul className="list-disc list-inside mt-2 space-y-1">
-                    <li>All lab environments and configurations</li>
-                    <li>Product search history and saved results</li>
-                    <li>Team member access and permissions</li>
-                    <li>Reports and analysis data</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div className="flex space-x-2 pt-4">
-              <Button variant="outline" className="flex-1 bg-transparent" onClick={() => setIsDeleteOpen(false)}>
-                Cancel
-              </Button>
-              <Button variant="destructive" className="flex-1" onClick={confirmDeleteWorkspace}>
-                Delete Workspace
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {/* Workspace Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <Shield className="h-8 w-8 text-cyan-500" />
-              <div>
-                <div className="text-2xl font-bold">2</div>
-                <div className="text-sm text-muted-foreground">Active Workspaces</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <Users className="h-8 w-8 text-blue-500" />
-              <div>
-                <div className="text-2xl font-bold">6</div>
-                <div className="text-sm text-muted-foreground">Team Members</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <BarChart3 className="h-8 w-8 text-blue-500" />
-              <div>
-                <div className="text-2xl font-bold">15</div>
-                <div className="text-sm text-muted-foreground">Active Labs</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Simplified Workspace Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-cyan-100 dark:bg-cyan-900 rounded-lg flex items-center justify-center">
-                  <Shield className="w-6 h-6 text-cyan-600" />
-                </div>
-                <div>
-                  <CardTitle className="flex items-center space-x-2">
-                    <span>Erika Workspace</span>
-                    <Badge variant="secondary">Personal</Badge>
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">Your default workspace</p>
-                </div>
-              </div>
-              <Button variant="outline" size="sm" onClick={() => openEditDialog("personal")}>
-                <Edit className="w-4 h-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="text-center">
-                <div className="text-lg font-bold text-cyan-600">5</div>
-                <div className="text-xs text-muted-foreground">Active Labs</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-blue-600">12</div>
-                <div className="text-xs text-muted-foreground">Searches</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-blue-600">8</div>
-                <div className="text-xs text-muted-foreground">Reports</div>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span>Resource Usage</span>
-                <span className="text-cyan-600 font-medium">6.5 GB</span>
-              </div>
-              <Progress value={65} className="h-2" />
-              <div className="text-xs text-muted-foreground">Last active: 2 hours ago</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* TechCorp Security Workspace */}
-        <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6 text-blue-600" />
-                </div>
-                <div>
-                  <CardTitle className="flex items-center space-x-2">
-                    <span>TechCorp Security</span>
-                    <Badge variant="secondary">Team</Badge>
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">5 team members</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Button variant="outline" size="sm" onClick={() => openEditDialog("team")}>
-                  <Edit className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-950/50 bg-transparent"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleDeleteWorkspace("TechCorp Security")
-                  }}
-                >
-                  <X className="w-4 h-4 text-red-500" />
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="text-center">
-                <div className="text-lg font-bold text-blue-600">18</div>
-                <div className="text-xs text-muted-foreground">Active Labs</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-blue-600">47</div>
-                <div className="text-xs text-muted-foreground">Searches</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-blue-600">23</div>
-                <div className="text-xs text-muted-foreground">Reports</div>
-              </div>
-            </div>
-            <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
-              <div className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">Network Security Testing</div>
-              <div className="flex items-center justify-between text-xs text-blue-600">
-                <span>25 minutes remaining</span>
-                <span>45% complete</span>
-              </div>
-              <Progress value={45} className="h-2 mt-2" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Workspace</DialogTitle>
+          </DialogHeader>
+          <p className="text-muted-foreground">
+            Are you sure you want to delete this workspace? This action cannot be undone.
+          </p>
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteWorkspace}>
+              Delete Workspace
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
